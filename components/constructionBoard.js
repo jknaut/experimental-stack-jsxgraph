@@ -5,12 +5,14 @@
  * Example of how to use the function in STACK:
  * 1) Use the following jsxgraph-block for the circle diagram and the operating point:
  * [[jsxgraph width="600px" height="600px" input-ref-ansAxisLabels="ansAxisLabelsRef" input-ref-ansSOK="ansSOKRef" input-ref-ansStateStorage="ansStateStorageRef" input-ref-ansBP="ansBPRef"]]
+ * ...
+ * [[/jsxgraph]]
  * 2) Create the following input fields in STACK:
  * ansAxisLabels: algebraic input with model solution [1, 4],
  * ansSOK: algebraic input with syntax hint and model solution ["-1", [], -1],
  * ansStateStorage: string with syntax hint and model solution "",
  * ansBP: algebraic input with syntax hint and model solution ["-1", [], []],
- * 3) Copy the following function inside a working and empty JSXGraph environment.
+ * 3) Copy the following function "var createConstructionBoard = ..." inside the STACK jsxgraph-block.
  * 4) Define the options you need (you can look at the defaultOptions to find the correct format):
  * var options = { ... };
  * 3) Call the function with these options:
