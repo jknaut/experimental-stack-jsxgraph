@@ -18,7 +18,7 @@
 var createConstructionBoard = (userOptions = {}) => {
     /* Date of last change: 05/04/2025 */
     /* Created by: Johannes Knaut, OTH Amberg-Weiden */
-    
+
     const defaultOptions = {
 
         checkSOK: true,
@@ -27,7 +27,7 @@ var createConstructionBoard = (userOptions = {}) => {
         tapePrecision: 1,
 
         withPhasorDiagram: false,
-        vecPositions: [[-9,11],[-6,11],[-9,10],[-6,10],[-9,9],[-6,9],[-9,8],[-6,8],[-9,7],[-6,7],[-9,6],[-6,6],[-9,5],[-6,5],[-9,4],[-6,4]],
+        vecPositions: [[-9, 11], [-6, 11], [-9, 10], [-6, 10], [-9, 9], [-6, 9], [-9, 8], [-6, 8], [-9, 7], [-6, 7], [-9, 6], [-6, 6], [-9, 5], [-6, 5], [-9, 4], [-6, 4]],
         vecLabels: ["\\(\\underline{U}_1\\)", "\\(\\underline{I}_1\\)", "\\(\\underline{U}_P\\)", "\\(\\underline{I}_{\\mu}\\)", "\\(\\underline{I}'_E\\)", "\\(\\underline{U}_r\\)", "\\(-j X_{1\\sigma} \\cdot \\underline{I}_1\\)", "\\(-j X_h \\cdot \\underline{I}_1\\)"],
         useMathJax: false,
 
@@ -303,7 +303,7 @@ var createConstructionBoard = (userOptions = {}) => {
                 var nCart = { 'real': x, 'imag': y };
                 var nPolar = convert2Polar(nCart);
                 /*multiply with i, if y-axis has Re */
-                if (pAxisLabelsData.Y() == 4) {
+                if (pAxisLabelsData && pAxisLabelsData.Y() == 4) {
                     nPolar = { 'abs': nPolar.abs, 'angle': JXG.Math.mod(nPolar.angle - 90.0, 360) };
                 }
                 var r = nPolar.abs.toFixed(2);
@@ -318,7 +318,7 @@ var createConstructionBoard = (userOptions = {}) => {
                 var nCart = { 'real': x, 'imag': y };
                 var nPolar = convert2Polar(nCart);
                 /*multiply with i, if y-axis has Re */
-                if (pAxisLabelsData.Y() == 4) {
+                if (pAxisLabelsData && pAxisLabelsData.Y() == 4) {
                     nPolar = { 'abs': nPolar.abs, 'angle': JXG.Math.mod(nPolar.angle - 90.0, 360) };
                 }
                 var r = nPolar.abs.toFixed(2);
@@ -373,8 +373,8 @@ var createConstructionBoard = (userOptions = {}) => {
     }
 
     const optionsText = '<option value="nochoice"></option><option value="-Im">-Im/cm</option><option value="-Re">-Re/cm</option><option value="Im">Im/cm</option><option value="Re">Re/cm</option>';
-    const xmin = -10;
-    const xmax = 11;
+    const xmin = options.showStaticAsyncSOK ? -5 : -10;
+    const xmax = options.showStaticAsyncSOK ? 16 : 11;
     const ymin = -8.5;
     const ymax = 12.5;
     const board = JXG.JSXGraph.initBoard(divid, {
@@ -384,11 +384,11 @@ var createConstructionBoard = (userOptions = {}) => {
         keepAspectRatio: true,
         defaultAxes: {
             x: {
-                name: '<select name="xAxisChoice" id="xAxisChoice">' + optionsText + '</select>',
+                name: options.showStaticAsyncSOK ? '-Im/cm' : '<select name="xAxisChoice" id="xAxisChoice">' + optionsText + '</select>',
                 withLabel: true,
                 label: {
                     position: 'rt',
-                    offset: [-65, -30],
+                    offset: options.showStaticAsyncSOK ? [-40, -30] : [-65, -30],
                     cssStyle: 'font-weight: bold;'
                 },
                 ticks: {
@@ -400,11 +400,11 @@ var createConstructionBoard = (userOptions = {}) => {
                 }
             },
             y: {
-                name: '<select name="yAxisChoice" id="yAxisChoice">' + optionsText + '</select>',
+                name: options.showStaticAsyncSOK ? 'Re/cm' : '<select name="yAxisChoice" id="yAxisChoice">' + optionsText + '</select>',
                 withLabel: true,
                 label: {
                     position: 'rt',
-                    offset: [-92, -5],
+                    offset: options.showStaticAsyncSOK ? [-72, -5] : [-92, -5],
                     cssStyle: 'font-weight: bold;'
                 },
                 ticks: {
@@ -422,23 +422,28 @@ var createConstructionBoard = (userOptions = {}) => {
         },
     });
 
-    /* Daten von STACK holen oder verbinden */
-    var initialChoices = document.getElementById(ansAxisLabelsRef).value;
-    var pAxisLabelsData = board.create('point', [0, 0], { visible: false, highlight: false, size: 0 });
-    stack_jxg.bind_point(ansAxisLabelsRef, pAxisLabelsData);
-    changeDropdownChoice('xAxisChoice', Math.round(pAxisLabelsData.X()));
-    changeDropdownChoice('yAxisChoice', Math.round(pAxisLabelsData.Y()));
 
-    document.addEventListener('change', (e) => {
-        pAxisLabelsData.moveTo([document.getElementById('xAxisChoice').selectedIndex, document.getElementById('yAxisChoice').selectedIndex]);
-    });
+    /* Daten von STACK holen oder verbinden */
+    var pAxisLabelsData = null;
+    if (!options.showStaticAsyncSOK) {
+        var initialChoices = document.getElementById(ansAxisLabelsRef).value;
+        pAxisLabelsData = board.create('point', [0, 0], { visible: false, highlight: false, size: 0 });
+        stack_jxg.bind_point(ansAxisLabelsRef, pAxisLabelsData);
+        changeDropdownChoice('xAxisChoice', Math.round(pAxisLabelsData.X()));
+        changeDropdownChoice('yAxisChoice', Math.round(pAxisLabelsData.Y()));
+
+        document.addEventListener('change', (e) => {
+            pAxisLabelsData.moveTo([document.getElementById('xAxisChoice').selectedIndex, document.getElementById('yAxisChoice').selectedIndex]);
+        });
+    }
+
     var pstyle = { name: '', snapToGrid: false, snapSizeX: 0.1, snapSizeY: 0.1, size: 4, showInfobox: false };
 
     board.highlightInfobox = function (x, y, el) {
         var nCart = { 'real': x, 'imag': y };
         var nPolar = convert2Polar(nCart);
         /*multiply with i, if y-axis has Re */
-        if (pAxisLabelsData.Y() == 4) {
+        if (pAxisLabelsData && pAxisLabelsData.Y() == 4) {
             nPolar = { 'abs': nPolar.abs, 'angle': JXG.Math.mod(nPolar.angle - 90.0, 360) };
         }
         var r = nPolar.abs.toFixed(2);
@@ -530,15 +535,16 @@ var createConstructionBoard = (userOptions = {}) => {
       myAttractors.push(board.create('point', [0, i], {size: 6, showInfobox: false, color: 'transparent', highlightColor: 'transparent', withLabel: false, fixed: true, highlight: false}));
     }
     */
-    var tape = board.create('tapemeasure', [[5, -6.5], [10, -6.5]], { name: 'L', precision: options.tapePrecision });
+    var mpls = options.showStaticAsyncSOK ? [[10, -6.5], [15, -6.5], [13, -5], [10, -5], [11.5, -5]] : [[5, -6.5], [10, -6.5], [8, -5], [5, -5], [6.5, -5]];
+    var tape = board.create('tapemeasure', [mpls[0], mpls[1]], { name: 'L', precision: options.tapePrecision });
     tape.point1.setAttribute({ ignoredSnapToPoints: [], attractorDistance: 5 });
     tape.point2.setAttribute({ ignoredSnapToPoints: [], attractorDistance: 5 });
     tape.label.setAttribute({ fontWeight: 'bold', strokeColor: 'white', cssStyle: 'backgroundColor: rgba(0, 0, 0, 0.7); padding: 3px' });
 
     const amPStyle = { showInfobox: false, withLabel: false, size: 6, strokeColor: col5, fillColor: 'transparent', highlightFillColor: 'transparent', attractors: myAttractors, attractorDistance: 0.7, snatchDistance: 0.7 };
-    var amStart = board.create('point', [8, -5], { ...amPStyle });
-    var amEnd = board.create('point', [5, -5], { ...amPStyle });
-    var amCenter = board.create('point', [6.5, -5], { ...amPStyle });
+    var amStart = board.create('point', mpls[2], { ...amPStyle });
+    var amEnd = board.create('point', mpls[3], { ...amPStyle });
+    var amCenter = board.create('point', mpls[4], { ...amPStyle });
     var amRightSeg = board.create('segment', [amStart, amCenter], { strokeColor: col5 });
     var amLeftSeg = board.create('segment', [amCenter, amEnd], { strokeColor: col5 });
     var angleMeasure = board.create('angle', [amStart, amCenter, amEnd], { label: { cssStyle: 'backgroundColor: rgba(0, 0, 0, 0.7); padding: 3px', strokeColor: 'white' }, fillColor: col5, strokeColor: col5, name: () => '&phi; = ' + JXG.Math.Geometry.trueAngle(amStart, amCenter, amEnd).toFixed(0) + '°' });
@@ -574,7 +580,7 @@ var createConstructionBoard = (userOptions = {}) => {
                 var nCart = { 'real': vecs[j].point2.X() - vecs[j].point1.X(), 'imag': vecs[j].point2.Y() - vecs[j].point1.Y() };
                 var nPolar = convert2Polar(nCart);
                 /*multiply with i, if y-axis has Re */
-                if (pAxisLabelsData.Y() == 4) {
+                if (pAxisLabelsData && pAxisLabelsData.Y() == 4) {
                     nPolar = { 'abs': nPolar.abs, 'angle': JXG.Math.mod(nPolar.angle - 90.0, 360) };
                 }
                 var r = nPolar.abs.toFixed(1);
@@ -643,6 +649,41 @@ var createConstructionBoard = (userOptions = {}) => {
 
     /* Muster-SOK anzeigen für x:=(-Im) und y:=Re */
 
+    if (options.showStaticAsyncSOK) {
+
+        const solPStyle = { color: 'darkred' };
+        const solVecStyle = { strokeColor: Colors.purple, strokeWidth: 2 };
+        const solHelperCircStyle = { visible: false, strokeColor: Colors.orange, strokeWidth: 1 };
+        const solSOKStyle = { strokeColor: Colors.blue, strokeWidth: 3 };
+        const solLineStyle = { visible: false, strokeColor: 'black', strokeWidth: 2 };
+        var p_Inenn_coords = interpreteCoords([options.xInenncm, options.yInenncm], ['-Im', 'Re']);
+        var vec_Inenn = board.create("arrow", [[0, 0], p_Inenn_coords], { ...solVecStyle });
+        var p_Istill_coords = interpreteCoords([options.xIstillcm, options.yIstillcm], ['-Im', 'Re']);
+        var vec_Istill = board.create("arrow", [[0, 0], p_Istill_coords], { ...solVecStyle });
+        const helper_circ_radius = Math.max(Math.abs(p_Istill_coords[0]), Math.abs(p_Inenn_coords[0]));
+        var helper_circ_Istill = board.create('circle', [p_Istill_coords, helper_circ_radius], { ...solHelperCircStyle });
+        var helper_circ_Inenn = board.create('circle', [p_Inenn_coords, helper_circ_radius], { ...solHelperCircStyle });
+        var p_Istill = board.create('point', p_Istill_coords, { ...solPStyle, name: 's=1', withLabel: true, showInfobox: false });
+        var p_Inenn = board.create('point', p_Inenn_coords, { ...solPStyle, name: 's=s<sub>N</sub>', withLabel: true, showInfobox: false, label: { anchorX: 'right', anchorY: 'bottom' } });
+        var line_Inenn_Istill = board.create('line', [p_Istill, p_Inenn], { ...solLineStyle, strokeWidth: 1 });
+        var midp_Inenn_Istill = board.create('midpoint', [p_Istill, p_Inenn], { visible: false, ...solPStyle });
+        var line_perp = board.create('perpendicular', [line_Inenn_Istill, midp_Inenn_Istill], { ...solLineStyle });
+        var center_SOK = board.create('intersection', [board.defaultAxes.x, line_perp], { ...solPStyle, color: Colors.blue });
+        var radius_SOK = JXG.Math.Geometry.distance(p_Istill_coords, [center_SOK.X(), center_SOK.Y()], 2);
+        var circ_SOK = board.create('circle', [center_SOK, radius_SOK], { ...solSOKStyle });
+
+        var musterElements = [vec_Inenn, vec_Istill, helper_circ_Istill, helper_circ_Inenn, p_Istill, p_Inenn, line_Inenn_Istill, midp_Inenn_Istill, line_perp, center_SOK, circ_SOK];
+        for (let i = 0; i < musterElements.length; i++) {
+            musterElements[i].setAttribute({ fixed: true, strokeOpacity: 0.7, fillOpacity: 0.7, highlight: false });
+        }
+        
+    }
+
+
+
+
+
+    /* TODO: Muster-SOK durch Checkbox anzeigen für x:=(-Im) und y:=Re */
     /*
     const solPStyle = {color: 'darkred'};
     const solVecStyle = {strokeColor: Colors.purple, strokeWidth: 2};
