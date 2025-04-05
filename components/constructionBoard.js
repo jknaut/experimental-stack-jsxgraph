@@ -9,7 +9,7 @@
  * ansSOK: algebraic input with syntax hint and model solution ["-1", [], -1],
  * ansStateStorage: string with syntax hint and model solution "",
  * ansBP: algebraic input with syntax hint and model solution ["-1", [], []],
- * 3) Copy the following function "var createConstructionBoard = ..." inside the STACK jsxgraph-block.
+ * 3) Copy the following function "var createConstructionBoard = ..." inside the STACK jsxgraph-block. (Date of change indicates the version!)
  * 4) Define the options you need (you can look at the defaultOptions to find the correct format):
  * var options = { ... };
  * 3) Call the function with these options:
