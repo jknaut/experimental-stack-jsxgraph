@@ -1,3 +1,6 @@
+/* Date of last change: 05/04/2025 */
+/* Created by: Johannes Knaut, OTH Amberg-Weiden */
+
 /* Creates a scatter plot matrix */
 /* Example: board.create('scatterplotmatrix', [dataSet, attributeLabels], {withDimLabels: true, cellPadding: 0.25}); */
 function createSplom(board, parents, attributes) {

@@ -1,4 +1,5 @@
 /* Date of last change: 05/04/2025 */
+/* Created by: Johannes Knaut, OTH Amberg-Weiden */
 
 /* Creates a JSXGraph board to construct circle diagrams or phasor diagrams */
 /* Example of how to use the function: */
