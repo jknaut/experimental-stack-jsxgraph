@@ -1,24 +1,21 @@
 /* Date of last change: 05/04/2025 */
 /* Created by: Johannes Knaut, OTH Amberg-Weiden */
 
-/* Creates a JSXGraph board (inside an empty STACK jsxgraph-block) to construct circle diagrams or phasor diagrams */
-/* Example of how to use the function in STACK: */
-/**
- * 1) Use the following jsxgraph-block for the circle diagram:
+/** Creates a JSXGraph board (inside an empty STACK jsxgraph-block) to construct a circle diagram, to plot an operating point, or to construct a phasor diagram.
+ * Example of how to use the function in STACK:
+ * 1) Use the following jsxgraph-block for the circle diagram and the operating point:
  * [[jsxgraph width="600px" height="600px" input-ref-ansAxisLabels="ansAxisLabelsRef" input-ref-ansSOK="ansSOKRef" input-ref-ansStateStorage="ansStateStorageRef" input-ref-ansBP="ansBPRef"]]
  * 2) Create the following input fields in STACK:
  * ansAxisLabels: algebraic input,
  * ansSOK: algebraic input with syntax hint ["-1", [], -1],
  * ansStateStorage: string with syntax hint "",
  * ansBP: algebraic input with syntax hint ["-1", [], []],
- * 
- * 
+ * 3) Copy the following function inside a working and empty JSXGraph environment.
+ * 4) Define the options you need (you can look at the defaultOptions to find the correct format):
+ * var options = { ... };
+ * 3) Call the function with these options:
+ * createConstructionBoard(options);
  */
-/* 1) Copy this function inside a working and empty JSXGraph environment. */
-/* 2) Define the options you need (you can look at the defaultOptions to find the correct format): */
-/* var options = { ... }; */
-/* 3) Call the function with these options: */
-/* createConstructionBoard(options);*/
 var createConstructionBoard = (userOptions = {}) => {
 
     const defaultOptions = {
