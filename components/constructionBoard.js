@@ -6,7 +6,7 @@
  * 1) Use the following jsxgraph-block for the circle diagram and the operating point:
  * [[jsxgraph width="600px" height="600px" input-ref-ansAxisLabels="ansAxisLabelsRef" input-ref-ansSOK="ansSOKRef" input-ref-ansStateStorage="ansStateStorageRef" input-ref-ansBP="ansBPRef"]]
  * 2) Create the following input fields in STACK:
- * ansAxisLabels: algebraic input,
+ * ansAxisLabels: algebraic input with model solution [1, 4],
  * ansSOK: algebraic input with syntax hint ["-1", [], -1],
  * ansStateStorage: string with syntax hint "",
  * ansBP: algebraic input with syntax hint ["-1", [], []],
