@@ -1,13 +1,12 @@
-/* Date of last change: 05/04/2025 */
-/* Created by: Johannes Knaut, OTH Amberg-Weiden */
-
 /** Creates a scatter plot matrix
  * This specific extension will consume the board. (This is unusual for extensions...)
  * Example usage:
  * var board = JXG.JSXGraph.initBoard(divid, {axis: false, grid: false, showCopyright: false, showNavigation: false, boundingbox: [-5, 5, 5, -5], keepaspectratio: false, pan: {enabled: false}, zoom: {wheel: false}});
  * var matrix = board.create("scatterplotmatrix", [dataSets, dataSetLabels], {withDimLabels: true, cellPadding: 0.25});
- */
+*/
 function createSplom(board, parents, attributes) {
+        /* Date of last change: 05/04/2025 */
+        /* Created by: Johannes Knaut, OTH Amberg-Weiden */
 
         var dataSets = parents[0];
         var dataSetLabels = parents[1];

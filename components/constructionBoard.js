@@ -1,6 +1,3 @@
-/* Date of last change: 05/04/2025 */
-/* Created by: Johannes Knaut, OTH Amberg-Weiden */
-
 /** Creates a JSXGraph board (inside an empty STACK jsxgraph-block) to construct a circle diagram, to plot an operating point, or to construct a phasor diagram.
  * Example of how to use the function in STACK:
  * 1) Use the following jsxgraph-block for the circle diagram and the operating point:
@@ -17,9 +14,11 @@
  * var options = { ... };
  * 3) Call the function with these options:
  * createConstructionBoard(options);
- */
+*/
 var createConstructionBoard = (userOptions = {}) => {
-
+    /* Date of last change: 05/04/2025 */
+    /* Created by: Johannes Knaut, OTH Amberg-Weiden */
+    
     const defaultOptions = {
 
         checkSOK: true,
