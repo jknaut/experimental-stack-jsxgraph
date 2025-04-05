@@ -26,7 +26,7 @@ var createConstructionBoard = (userOptions = {}) => {
         tapePrecision: 1,
 
         withPhasorDiagram: false,
-        taZD: [[-9,11],[-6,11],[-9,10],[-6,10],[-9,9],[-6,9],[-9,8],[-6,8],[-9,7],[-6,7],[-9,6],[-6,6],[-9,5],[-6,5],[-9,4],[-6,4]],
+        vecPositions: [[-9,11],[-6,11],[-9,10],[-6,10],[-9,9],[-6,9],[-9,8],[-6,8],[-9,7],[-6,7],[-9,6],[-6,6],[-9,5],[-6,5],[-9,4],[-6,4]],
         vecLabels: ["\\(\\underline{U}_1\\)", "\\(\\underline{I}_1\\)", "\\(\\underline{U}_P\\)", "\\(\\underline{I}_{\\mu}\\)", "\\(\\underline{I}'_E\\)", "\\(\\underline{U}_r\\)", "\\(-j X_{1\\sigma} \\cdot \\underline{I}_1\\)", "\\(-j X_h \\cdot \\underline{I}_1\\)"],
         useMathJax: false,
 
@@ -554,7 +554,7 @@ var createConstructionBoard = (userOptions = {}) => {
         const attDist = 0.3;
         const vecPointStyle = { color: "grey", size: 1, fixed: false, highlight: false, showInfobox: false, snapToGrid: false, snapToPoints: true, attractorDistance: attDist };
         const vecStyle = { withLabel: true, strokeWidth: 1, opacity: 0.75, lastArrow: { type: 2, size: 14 } };
-        var pCoords = options.taZD;
+        var pCoords = options.vecPositions;
         var ps = [];
         var vecs = [];
         var vecLabels = options.vecLabels;
