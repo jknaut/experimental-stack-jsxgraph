@@ -7,7 +7,7 @@
 /* createConstructionBoard(options);*/
 var createConstructionBoard = (userOptions = {}) => {
 
-    defaultOptions = {
+    const defaultOptions = {
       
         checkSOK: true,
         checkBP: true,
