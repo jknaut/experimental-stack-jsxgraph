@@ -1,8 +1,19 @@
 /* Date of last change: 05/04/2025 */
 /* Created by: Johannes Knaut, OTH Amberg-Weiden */
 
-/* Creates a JSXGraph board to construct circle diagrams or phasor diagrams */
-/* Example of how to use the function: */
+/* Creates a JSXGraph board (inside an empty STACK jsxgraph-block) to construct circle diagrams or phasor diagrams */
+/* Example of how to use the function in STACK: */
+/**
+ * 1) Use the following jsxgraph-block for the circle diagram:
+ * [[jsxgraph width="600px" height="600px" input-ref-ansAxisLabels="ansAxisLabelsRef" input-ref-ansSOK="ansSOKRef" input-ref-ansStateStorage="ansStateStorageRef" input-ref-ansBP="ansBPRef"]]
+ * 2) Create the following input fields in STACK:
+ * ansAxisLabels: algebraic input,
+ * ansSOK: algebraic input with syntax hint ["-1", [], -1],
+ * ansStateStorage: string with syntax hint "",
+ * ansBP: algebraic input with syntax hint ["-1", [], []],
+ * 
+ * 
+ */
 /* 1) Copy this function inside a working and empty JSXGraph environment. */
 /* 2) Define the options you need (you can look at the defaultOptions to find the correct format): */
 /* var options = { ... }; */
@@ -18,7 +29,7 @@ var createConstructionBoard = (userOptions = {}) => {
         tapePrecision: 1,
 
         withPhasorDiagram: false,
-        taZD: [[0.0, 0.0], [5.22961956521, 0.0], [0.0, 0.0], [-3.22144715417, 3.28653346969], [0.0, 0.0], [10.6519116472, 5.31490932857], [0.0, 0.0], [0.609665977407, -4.39161794651], [-3.22144715417, 3.28653346969], [0.609665977407, -4.39161794651], [0.0, 0.0], [6.09249854801, 0.84579057818], [5.22961956521, 0.0], [6.09249854801, 0.84579057818], [6.09249854801, 0.84579057818], [10.6519116472, 5.31490932857]],
+        taZD: [[-9,11],[-6,11],[-9,10],[-6,10],[-9,9],[-6,9],[-9,8],[-6,8],[-9,7],[-6,7],[-9,6],[-6,6],[-9,5],[-6,5],[-9,4],[-6,4]],
         vecLabels: ["\\(\\underline{U}_1\\)", "\\(\\underline{I}_1\\)", "\\(\\underline{U}_P\\)", "\\(\\underline{I}_{\\mu}\\)", "\\(\\underline{I}'_E\\)", "\\(\\underline{U}_r\\)", "\\(-j X_{1\\sigma} \\cdot \\underline{I}_1\\)", "\\(-j X_h \\cdot \\underline{I}_1\\)"],
         useMathJax: false,
 
