@@ -1,6 +1,8 @@
+/* Date of last change: 05/04/2025 */
+
 /* Creates a JSXGraph board to construct circle diagrams or phasor diagrams */
 /* Example of how to use the function: */
-/* 1) Copy this function inside a working JSXGraph environment */
+/* 1) Copy this function inside a working and empty JSXGraph environment. */
 /* 2) Define the options you need (you can look at the defaultOptions to find the correct format): */
 /* var options = { ... }; */
 /* 3) Call the function with these options: */
