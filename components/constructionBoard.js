@@ -16,7 +16,7 @@
  * createConstructionBoard(options);
 */
 var createConstructionBoard = (userOptions = {}) => {
-    /* Date of last change: 05/04/2025 */
+    /* Date of last change: 06/04/2025 */
     /* Created by: Johannes Knaut, OTH Amberg-Weiden */
 
     const defaultOptions = {
@@ -30,6 +30,12 @@ var createConstructionBoard = (userOptions = {}) => {
         vecPositions: [[-9, 11], [-6, 11], [-9, 10], [-6, 10], [-9, 9], [-6, 9], [-9, 8], [-6, 8], [-9, 7], [-6, 7], [-9, 6], [-6, 6], [-9, 5], [-6, 5], [-9, 4], [-6, 4]],
         vecLabels: ["\\(\\underline{U}_1\\)", "\\(\\underline{I}_1\\)", "\\(\\underline{U}_P\\)", "\\(\\underline{I}_{\\mu}\\)", "\\(\\underline{I}'_E\\)", "\\(\\underline{U}_r\\)", "\\(-j X_{1\\sigma} \\cdot \\underline{I}_1\\)", "\\(-j X_h \\cdot \\underline{I}_1\\)"],
         useMathJax: false,
+
+        showStaticAsyncSOK: false,
+        xInenncm: 1.67,
+        yInenncm: -0.9,
+        xIstillcm: 2.78,
+        yIstillcm: -11.62,
 
     };
     const options = { ...defaultOptions, ...userOptions };
@@ -676,7 +682,7 @@ var createConstructionBoard = (userOptions = {}) => {
         for (let i = 0; i < musterElements.length; i++) {
             musterElements[i].setAttribute({ fixed: true, strokeOpacity: 0.7, fillOpacity: 0.7, highlight: false });
         }
-        
+
     }
 
 
