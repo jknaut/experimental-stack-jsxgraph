@@ -1,0 +1,1511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 356655  -->
+  <question type="stack">
+    <name>
+      <text>Switching_Curves_Minimal_Example</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p></p>
+<div>
+  <h4>Problem Statement:</h4>
+  <p>You are given a circuit with a switch that changes states at specific times.</p>
+  <p>Your task is to draw the switching curve based on the given switching times and voltage levels.</p>
+  <ul>
+    <li>The switch is initially in the OFF state.</li>
+    <li>The switch turns ON at \( t = 10 \) seconds.</li>
+    <li>The switch turns OFF at \( t = 30 \) seconds.</li>
+    <li>The switch turns ON again at \( t = 50 \) seconds.</li>
+    <li>The switch turns OFF at \( t = 70 \) seconds.</li>
+  </ul>
+</div>
+
+<!--
+#################################
+#################################
+#################################
+-->
+
+<br>
+
+<details style="background-color: lightgrey; border-radius: 6px;">
+  <summary><i>Input notes</i></summary>
+  <ul>
+    <li>By left-clicking, you can insert points or select existing points and the corresponding section (orange).</li>
+    <li>You can use the button to change the type of the active section (orange).</li>
+    <li>Right-click to delete a point and the associated section.</li>
+  </ul>
+</details>
+
+<p hidden>[[input:ansCursor]] [[validation:ansCursor]]</p>
+<div hidden>
+<div>[[input:ansModelSolution1]][[validation:ansModelSolution1]]</div>
+</div>
+<details open><summary>Switching curve</summary>
+    <div>
+    <div style="display:inline-block">
+[[jsxgraph width="800px" height="300px" input-ref-ansPg1="ansPg1Ref" input-ref-ansErr1="ansErr1Ref" input-ref-ansCursor="ansCursorRef"]]
+
+        var ans1Ref = ansPg1Ref;
+        var ans2Ref = ansErr1Ref;
+        var ta = {#ta1#};
+        const tmin = {#tmin#};
+        const tmax = {#tmax#};
+
+/* ONLY copy from VSCode after this line*/
+
+        /* configure with Maxima data */
+        const XMAX = tmax;
+        const XMIN = tmin;
+        const YMAX = 1.0;
+        const YMIN = -YMAX;
+        const Y_TICKS_DIST = YMAX;
+        const Y_SNAP_SIZE = 1 / 4 * 10 ** (Math.floor(Math.log10(Math.abs(YMAX))));
+        const X_SNAP_SIZE = 0.01;
+
+        /* Set global options */
+        {
+            JXG.Options.axis = JXG.merge(JXG.Options.axis, {
+                highlight: false,
+                label: { highlight: false },
+                ticks: { label: { highlight: false } }
+            });
+            JXG.Options.line = JXG.merge(JXG.Options.line, {
+                highlight: false,
+            });
+            JXG.Options.curve = JXG.merge(JXG.Options.curve, {
+                highlight: false,
+            });
+            JXG.Options.text = JXG.merge(JXG.Options.text, {
+                highlight: false,
+                fixed: true,
+                /*useMathJax: true,*/
+            });
+            JXG.Options.point = JXG.merge(JXG.Options.point, {
+                withLabel: false,
+                showInfobox: false,
+            });
+        }
+
+        /* Define colors */
+        const Colors = {
+            isabelline: '#f4f0ec',
+
+            /* colorblind-friendly colors */
+            orange: '#E69F00',
+            blue: '#0072B2',
+            red: '#D55E00',
+            green: '#009E73',
+            purple: '#CC79A7',
+        }
+
+
+        /* Declare global vars */
+        var allData = [];
+        var graph;
+        var gt_points;
+        var active_section = { pstart: null, pend: null };
+        var sliders = {};
+        var drag_points = {};
+        var isUpdateSuspended = false;
+
+        /**************************/
+        /* START OF Configuration */
+        const gt_pstyle = { snapToGrid: true, snapSizeX: X_SNAP_SIZE, snapSizeY: Y_SNAP_SIZE }; /*snapSizeY: 10.0*/
+        const active_col = Colors.red;
+        const endpoint_col = 'gray';
+        const normal_col = Colors.blue;
+        const modes = 5;
+        const xmin = XMIN;
+        const xmax = XMAX;
+        const ymax = YMAX;
+        const ymin = YMIN;
+        /* TODO: improve clearness of padding vars */
+        const padding_x = xmax / 10;
+        const padding_y_top = ymax / 2;
+        const padding_y_bot = 2 * padding_y_top;
+        const padding_y_factor = 7 / 6;
+        const bxmin = -padding_x;
+        const bymax = padding_y_factor * ymax + padding_y_top;
+        const bxmax = xmax + padding_x;
+        const bymin = padding_y_factor * ymin - padding_y_bot;
+        const cca_xmin = bxmin;
+        const cca_xmax = bxmax;
+        const cca_ymin = bymin;
+        const cca_ymax = bymin + padding_y_bot;
+        const switch_button_coords = [cca_xmin + 1 / 100 * Math.abs(cca_xmax - cca_xmin), cca_ymax - 1 / 4 * Math.abs(cca_ymax - cca_ymin)];
+        const section_text_coords = [cca_xmin + 1 / 100 * Math.abs(cca_xmax - cca_xmin), cca_ymin + 1 / 4 * Math.abs(cca_ymax - cca_ymin)];
+        const gt_bbox = [bxmin, bymax, bxmax, bymin];
+        const minZoom = 1 / 4;
+        const maxZoom = 4;
+        const compute_max_bbox = (bbox, minZoom, maxZoom) => {
+            const abs_bbox = bbox.map(n => Math.abs(n) / minZoom);
+            const maxX = Math.max(abs_bbox[0], abs_bbox[2]);
+            const maxY = Math.max(abs_bbox[1], abs_bbox[3]);
+            return [Math.sign(bbox[0]) * maxX,
+            Math.sign(bbox[1]) * maxY,
+            Math.sign(bbox[2]) * maxX,
+            Math.sign(bbox[3]) * maxY];
+        };
+        const gt_max_bbox = compute_max_bbox(gt_bbox, minZoom, maxZoom);
+        const gt_board_attributes = {
+            axis: false,
+            showCopyright: false,
+            showNavigation: true,
+            pan: { enabled: true },
+            zoom: {
+                wheel: true,
+                min: minZoom,
+                max: maxZoom,
+            },
+            maxBoundingBox: gt_max_bbox,
+        };
+        const centered_xticks = { ticksDistance: 50, majorHeight: -1, minorTicks: 0, drawLabels: true, highlight: false, label: { anchorX: 'middle', anchorY: 'top', offset: [0, -3] } };
+        const left_yticks = { ticksDistance: Y_TICKS_DIST, insertTicks: false, majorHeight: -1, minorTicks: 0, drawLabels: true, highlight: false, label: { anchorX: 'right', anchorY: 'middle', offset: [-5, 0] } };
+        const xaxis_label = '<span style="background-color: rgba(255, 255, 255, 0.9); padding: 0.25em; padding-bottom: 0em; font-weight: bold;"><em>t</em> (&mu;s)</span>';
+        const yaxis_label = '<span style="background-color: rgba(255, 255, 255, 0.9); padding: 0.25em; padding-top: 0.7em; font-weight: bold;">Switch State</span>';
+        const line_text = 'Line';
+        const rect_text = 'Rectangle';
+        const tri_text = 'Triangle';
+        const par_text = 'Parabola: &nbsp;<strong>a &middot; (x - S<sub>x</sub>)&sup2; + S<sub>y</sub></strong>';
+        const sine_text = 'Sine: &nbsp;<strong>A &middot; sin(2 &pi; f - &phi;</strong>)';
+        const section_texts = [line_text, rect_text, tri_text, par_text, sine_text];
+        const triangleXInit = xmin - 1; /* default value outside of range, to recognize initial triangle later and put it in the middle later */
+        const triangleYInit = ymin - 1; /* default value outside of range, to recognize initial triangle later and put it in the middle later */
+        const rectYInit = ymin - 1;  /* default value outside of range, to recognize initial rectangle later and move it later */
+        
+        /* sine and parabola configuration */
+        const parAInit = 4 * ymax / (xmax == 0 ? 0.01 : xmax * xmax);
+        const parAMin = -100 * parAInit;
+        const parAMax = 100 * parAInit;
+        const parSxMin = 0;
+        const parSxInit = 0.5 * xmax;
+        const parSxMax = xmax;
+        const parSyMin = -ymax;
+        const parSyInit = 0;
+        const parSyMax = ymax;
+        const sineAMin = -2 * ymax;
+        const sineAInit = ymax;
+        const sineAMax = 2 * ymax;
+        const sineFMin = -0.1;
+        const sineFInit = 0.01;
+        const sineFMax = 0.1;
+        const sinePhiMin = -360;
+        const sinePhiInit = 0;
+        const sinePhiMax = 360;
+        const endpoint_style = { color: endpoint_col, mode: 0, triangleX: triangleXInit, triangleY: triangleYInit, rectY: rectYInit, sineA: sineAInit, sineF: sineFInit, sinePhi: sinePhiInit, parA: parAInit, parSx: parSxInit, parSy: parSyInit };
+        /* END OF Configuration */
+        /************************/
+
+        /**********************/
+        /* START OF function definitions */
+        const create_gt_board = (board_id, bbox) => {
+            return JXG.JSXGraph.initBoard(board_id, {
+                boundingbox: bbox,
+                maxBoundingBox: bbox.map(n => 2 * n),
+                ...gt_board_attributes
+            });
+        };
+
+        const create_xaxis = (board) => {
+            return board.create('axis', [[0, 0], [1, 0]],
+                {
+                    name: function () { return xaxis_label },
+                    withLabel: true,
+                    label: { position: 'rt', offset: [-30, 4], anchorY: 'bottom' },
+                    ticks: { ...centered_xticks }
+                });
+        }
+
+        const createOnOffYAxis = (board, ylabel) => {
+            var yaxis = board.create('axis', [[0, 0], [0, 1]],
+                {
+                    name: function () { return ylabel },
+                    withLabel: true,
+                    label: { position: 'rt', offset: [-16, 6], anchorY: 'top' },
+                    ticks: { ticksDistance: 1, insertTicks: false, majorHeight: -1, minorTicks: 0, drawLabels: false, highlight: false },
+                });
+
+            board.create('ticks', [yaxis, [0, 1]], {
+                drawLabels: true,
+                label: {
+                    anchorY: 'middle',
+                    anchorX: 'right',
+                    parse: false,
+                    display: 'html',
+                    cssStyle: 'backgroundColor: white; padding: 1px;',
+                    offset: [-10, 0],
+                    highlight: false,
+                },
+                generateLabelText: (tick) => {
+                    var v = tick.usrCoords[2];
+                    switch (v) {
+                        case 0:
+                            return '<b>OFF</b>';
+                        case 1:
+                            return '<b>ON</b>';
+                    }
+                }
+            });
+            return yaxis;
+        }
+
+        function create600YAxis(board, yLabel) {
+            return board.create('axis', [[0, 0], [0, 1]],
+                {
+                    name: function () { return yLabel },
+                    withLabel: true,
+                    label: { position: 'rt', offset: [-5, 8], anchorY: "top", anchorX: "right" },
+                    ticks: { ...left_yticks }
+                });
+        }
+
+        const create_yaxis = (board) => {
+            return createOnOffYAxis(board, yaxis_label);
+            /*return create600YAxis(board, yaxis_label);*/
+        }
+
+        const create_controls_area = (board) => {
+            const cca_pstyle = { frozen: true, fixed: true, visible: false, size: 0, highlight: false, showInfobox: false };
+            const cca_polstyle = { hasInnerPoints: true, color: Colors.orange, highlight: false, opacity: 0.5, borders: { visible: false, highlight: false, fixed: true } };
+            const pBL = board.create('point', [cca_xmin, cca_ymin], { ...cca_pstyle });
+            const pBR = board.create('point', [cca_xmax, cca_ymin], { ...cca_pstyle });
+            const pTL = board.create('point', [cca_xmin, cca_ymax], { ...cca_pstyle });
+            const pTR = board.create('point', [cca_xmax, cca_ymax], { ...cca_pstyle });
+            return board.create('polygon', [pBL, pBR, pTR, pTL], { ...cca_polstyle });
+        }
+
+        const create_switch_button = (board, p_cca) => {
+            return board.create('button',
+                [...switch_button_coords, 'Change section type', () => {
+                    active_section.disconnect_sliders();
+                    const mode = active_section.switch_to_next_mode();
+                    p_cca.moveTo([mode, p_cca.Y()]);
+                    active_section.connect_sliders();
+                    board.unsuspendUpdate();
+                }],
+                { frozen: true, fontSize: 14, cssStyle: 'width: 14em;' });
+        }
+
+        const create_section_text = (board, p_cca) => {
+            return board.create('text', [...section_text_coords, () => section_texts[p_cca.X()]], {
+                frozen: true, cssStyle: 'width: 13.4em; text-align: center; background-color: white; padding: 4px;', fontSize: 14
+            });
+
+        }
+
+        function create_gt_section(board, parents, attributes) {
+            const get_f_line = (a, b) => [
+                x => {
+                    const slope = (b.Y() - a.Y()) / (b.X() - a.X());
+                    const y_intercept = a.Y() - slope * a.X();
+                    return slope * x + y_intercept;
+                },
+                () => a.X(),
+                () => b.X()
+            ];
+            const create_line = (a, b) => {
+                /*return board.create('functiongraph', [...get_f_line(a, b)], {});*/
+                return board.create('segment', [a, b], { strokeWidth: 1, fixed: true });
+            };
+            const create_triangle = (a, b) => {
+                var tx = a.getAttribute('triangleX');
+                var ty = a.getAttribute('triangleY');
+                tx = tx < xmin ? a.X() + (b.X() - a.X()) / 2 : tx;
+                ty = ty < ymin ? a.Y() + (b.Y() - a.Y()) / 2 : ty;
+                a.setAttribute({triangleX: tx, triangleY: ty});
+                return board.create('flextriangle', [a, b, tx, ty], {});
+            };
+            const create_rectangle = (a, b) => {
+                var ry = a.getAttribute('rectY');
+                ry = ry < ymin ? a.Y() : ry;
+                a.setAttribute({rectY : ry});
+                return board.create('flexrect', [a, b, ry], {});
+            };
+            const create_parabola = (a, b) => {
+                return board.create('dashedfun', [x => a.getAttribute('parA') * (x - a.getAttribute('parSx')) ** 2 + a.getAttribute('parSy'), () => a.X(), () => b.X(), xmin, xmax], {});
+            };
+            const create_sine_wave = (a, b) => {
+                return board.create('dashedfun', [x => a.getAttribute('sineA') * Math.sin(2 * Math.PI * a.getAttribute('sineF') * x - a.getAttribute('sinePhi') * Math.PI / 180.0), () => a.X(), () => b.X(), xmin, xmax], {});
+            };
+            const fs = [get_f_line];
+
+            const pa = parents[0];
+            const pb = parents[1];
+            const mode = pa.getAttribute('mode');
+
+            const create_section = (pa, pb, mode) => {
+                var section;
+                if (mode == 0) {
+                    section = create_line(pa, pb);
+                } else if (mode == 1) {
+                    section = create_rectangle(pa, pb);
+                } else if (mode == 2) {
+                    section = create_triangle(pa, pb);
+                } else if (mode == 3) {
+                    section = create_parabola(pa, pb);
+                } else if (mode == 4) {
+                    section = create_sine_wave(pa, pb);
+                } else {
+                    section = create_line(pa, pb);
+                }
+                section.setAttribute({ strokeColor: () => active_section.pstart == pa ? active_col : normal_col });
+                return section;
+            }
+
+            var section = create_section(pa, pb, mode);
+
+            const comp = new JXG.Composition({});
+            comp.pstart = pa;
+            comp.pend = pb;
+            comp.section = section;
+            comp.connect_sliders = () => {
+                const m = comp.pstart.getAttribute('mode');
+
+                const mSliders = [
+                    [],
+                    [],
+                    [],
+                    [['parA', sliders.parA], ['parSx', sliders.parSx], ['parSy', sliders.parSy]],
+                    [['sineA', sliders.sineA], ['sineF', sliders.sineF], ['sinePhi', sliders.sinePhi]],
+                ];
+                if (mSliders[m].length) {
+                    for (const sv of mSliders[m]) {
+                        const slider_val = parseFloat(comp.pstart.getAttribute(sv[0]).toFixed(4));
+                        sv[1].slider.setValue(slider_val);
+                        sv[1].input.rendNodeInput.value = slider_val;
+                        sv[1].input.rendNodeInput.setAttribute("data-sliderval", slider_val);
+                        const attrNew = {};
+                        attrNew[sv[0]] = slider_val;
+                        comp.pstart.setAttribute(attrNew);
+                    }
+                }
+                const mFunctions = [
+                    null,
+                    null,
+                    null,
+                    (x) => sliders.parA.slider.Value() * (x - sliders.parSx.slider.Value()) ** 2 + sliders.parSy.slider.Value(),
+                    (x) => sliders.sineA.slider.Value() * Math.sin(2 * Math.PI * sliders.sineF.slider.Value() * x - sliders.sinePhi.slider.Value() * Math.PI / 180.0),
+                ];
+                if (mFunctions[m]) {
+                    comp.section.updateY(mFunctions[m]);
+                    comp.section.updateCurve();
+                    for (const sv of mSliders[m]) {
+                        changeVisibilityOfSlider(sv[1], true);
+                    }
+                    if (isUpdateSuspended) {
+                        board.unsuspendUpdate();
+                        isUpdateSuspended = false;
+                        board.update();
+                        board.suspendUpdate();
+                        isUpdateSuspended = true;
+                    } else {
+                        board.update();
+                    }
+                }
+                if (m == 1) {
+                    drag_points.rectP = comp.section.drag_point;
+                } else if (m == 2) {
+                    drag_points.triangleP = comp.section.drag_point;
+                }
+            };
+            comp.disconnect_sliders = () => {
+                const m = comp.pstart.getAttribute('mode');
+
+                const mSliders = [
+                    [],
+                    [],
+                    [],
+                    [['parA', sliders.parA], ['parSx', sliders.parSx], ['parSy', sliders.parSy]],
+                    [['sineA', sliders.sineA], ['sineF', sliders.sineF], ['sinePhi', sliders.sinePhi]],
+                ];
+                const mMaps = [
+                    null,
+                    null,
+                    null,
+                    [{ parA: sliders.parA.slider.Value() }, { parSx: sliders.parSx.slider.Value() }, { parSy: sliders.parSy.slider.Value() }],
+                    [{ sineA: sliders.sineA.slider.Value() }, { sineF: sliders.sineF.slider.Value() }, { sinePhi: sliders.sinePhi.slider.Value() }],
+                ];
+                const mFunctions = [
+                    null,
+                    null,
+                    null,
+                    (x) => comp.pstart.getAttribute('parA') * (x - comp.pstart.getAttribute('parSx')) ** 2 + comp.pstart.getAttribute('parSy'),
+                    (x) => comp.pstart.getAttribute('sineA') * Math.sin(2 * Math.PI * comp.pstart.getAttribute('sineF') * x - comp.pstart.getAttribute('sinePhi') * Math.PI / 180.0),
+                ];
+                if (mMaps[m] && mFunctions[m] && mSliders[m].length > 0) {
+                    for (const s of mMaps[m]) {
+                        comp.pstart.setAttribute(s);
+                    }
+
+                    if (mFunctions[m] && mSliders[m].length > 0) {
+                        comp.section.updateY(mFunctions[m]);
+                        comp.section.updateCurve();
+                        for (const sv of mSliders[m]) {
+                            changeVisibilityOfSlider(sv[1], false);
+                        }
+                    }
+                }
+                if (isUpdateSuspended) {
+                    board.unsuspendUpdate();
+                    isUpdateSuspended = false;
+                    board.update();
+                    board.suspendUpdate();
+                    isUpdateSuspended = true;
+                } else {
+                    board.update();
+                }
+                if (m == 1) {
+                    comp.pstart.setAttribute({ rectY: drag_points.rectP.Y() });
+                } else if (m == 2) {
+                    comp.pstart.setAttribute({ triangleX: drag_points.triangleP.X() });
+                    comp.pstart.setAttribute({ triangleY: drag_points.triangleP.Y() });
+                }
+            }
+            comp.switch_to_next_mode = () => {
+                const mode = comp.pstart.getAttribute('mode');
+                const newMode = (mode + 1) % modes;
+                if (mode == 1 || mode == 2 || mode == 3 || mode == 4) {
+                    comp.section.removeFromBoard(board);
+                } else {
+                    board.removeObject(comp.section);
+                }
+                comp.section = create_section(pa, pb, newMode);
+                comp.pstart.setAttribute({ mode: newMode });
+                return newMode;
+            }
+            comp.removeFromBoard = () => {
+                const mode = comp.pstart.getAttribute('mode');
+                if (mode == 1 || mode == 2 || mode == 3 || mode == 4) {
+                    comp.section.removeFromBoard(board);
+                } else {
+                    board.removeObject(comp.section);
+                }
+            }
+
+            return comp;
+        }
+        JXG.create_gt_section = create_gt_section;
+        JXG.registerElement('gt_section', JXG.create_gt_section);
+
+        function create_gt_graph(board, parents, attributes) {
+
+            if (!JXG.exists(attributes)) attributes = {};
+
+            const create_section = (pa, pb) => {
+                return board.create('gt_section', [pa, pb], {});
+            };
+
+            var sections = [];
+            for (let i = 1; i < gt_points.length; i++) {
+                const pa = gt_points[i - 1];
+                const pb = gt_points[i];
+                const section = create_section(pa, pb);
+                sections.push(section);
+            }
+            const comp = new JXG.Composition({});
+            comp.sections = sections;
+            comp.get_index_before = (p) => {
+                var idx = 0;
+                for (let i = 0; i < gt_points.length; i++) {
+                    if (gt_points[i].id == p.id) {
+                        idx = i;
+                        break;
+                    }
+                }
+                if (idx == 0) return 0;
+                else return idx - 1;
+            };
+            comp.removeFromBoard = () => {
+                for (let i = 0; i < comp.sections.length; i++) {
+                    comp.sections[i].removeFromBoard();
+                }
+                comp.sections = [];
+            }
+            return comp;
+        }
+        JXG.create_gt_graph = create_gt_graph;
+        JXG.registerElement('gt_graph', JXG.create_gt_graph);
+
+        const create_initial_graph = (board) => {
+            return board.create('gt_graph', [], {});
+        }
+
+        function createPartlyDashedFunctiongraph(board, parents, attributes) {
+
+            if (!JXG.exists(attributes)) attributes = {};
+
+            const main = board.create('functiongraph', [parents[0], parents[1], parents[2]], attributes);
+
+            const dashed = board.create('functiongraph', [parents[0], parents[3], parents[4]], attributes);
+
+            const is_active = () => main.getAttribute('strokeColor') && (typeof main.getAttribute('strokeColor')) == "function" && main.getAttribute('strokeColor')() == active_col;
+            const dep_col = () => is_active() ? active_col : normal_col;
+            dashed.setAttribute({ dash: 2, strokeOpacity: 0.3, visible: is_active });
+
+            const helperPoint1 = board.create('point', [() => main.minX(), () => main.Y(main.minX())], { highlight: false, strokeColor: dep_col, strokeOpacity: 0.5, fillColor: 'none', size: 5, visible: true });
+            const helperSeg1 = board.create('line', [helperPoint1, [() => helperPoint1.X(), () => helperPoint1.Y() + 1]], { dash: 2, strokeColor: dep_col, strokeOpacity: 0.4, visible: true });
+            const helperPoint2 = board.create('point', [() => main.maxX(), () => main.Y(main.maxX())], { highlight: false, strokeColor: dep_col, strokeOpacity: 0.5, fillColor: 'none', size: 5, visible: true });
+            const helperSeg2 = board.create('line', [helperPoint2, [() => helperPoint2.X(), () => helperPoint2.Y() + 1]], { dash: 2, strokeColor: dep_col, strokeOpacity: 0.4, visible: true });
+
+            const comp = new JXG.Composition({ main: main, dashed: dashed, hp1: helperPoint1, hp2: helperPoint2, hs1: helperSeg1, hs2: helperSeg2 });
+
+            comp.setAttribute = attr => {
+                main.setAttribute(attr);
+                dashed.setAttribute(attr);
+            }
+
+            comp.updateY = y => {
+                main.Y = y;
+                dashed.Y = y;
+            }
+
+            comp.updateCurve = () => {
+                main.updateCurve();
+                dashed.updateCurve();
+            }
+
+            comp.updateMaxX = x => {
+                main.maxX = x;
+            }
+
+            comp.removeFromBoard = () => {
+                board.removeObject(main);
+                board.removeObject(dashed);
+                board.removeObject(helperPoint1);
+                board.removeObject(helperPoint2);
+                board.removeObject(helperSeg1);
+                board.removeObject(helperSeg2);
+            }
+
+            return comp;
+        }
+
+        JXG.createPartlyDashedFunctiongraph = createPartlyDashedFunctiongraph;
+        JXG.registerElement('dashedfun', JXG.createPartlyDashedFunctiongraph);
+
+        /*board.create('flexrect', [pa, pb, y], {});*/
+        function createRectangleWithDragPoint(board, parents, attributes) {
+
+            if (!JXG.exists(attributes)) attributes = {};
+
+            const pa = parents[0];
+            const pb = parents[1];
+            const y = parents[2];
+
+            const is_active = () => pa.getAttribute('strokeColor') && pa.getAttribute('strokeColor') == active_col;
+            const dep_col = () => is_active() ? active_col : normal_col;
+
+            const flexrectSegStyle = { strokeWidth: 1, fixed: true, strokeColor: dep_col };
+            const pMidP = board.create('midpoint', [pa, pb], { visible: false });
+            const pMidAxis = board.create('line', [[() => pMidP.X(), 0], [() => pMidP.X(), 1]], { visible: false });
+            const pMid = board.create('glider', [0, y, pMidAxis], { visible: () => (active_section.pstart ? active_section.pstart.id : "") == pa.id, face: 'square', snapToGrid: true, snapSizeY: Y_SNAP_SIZE });
+            const pLeft = board.create('point', [() => pa.X(), () => pMid.Y()], { visible: false, highlight: false, size: 0 });
+            const pRight = board.create('point', [() => pb.X(), () => pMid.Y()], { visible: false, highlight: false, size: 0 });
+
+            const pSegLeft = board.create('segment', [pa, pLeft], { ...flexrectSegStyle });
+            const pSegHor = board.create('segment', [pLeft, pRight], { ...flexrectSegStyle });
+            const pSegRight = board.create('segment', [pb, pRight], { ...flexrectSegStyle });
+
+            const comp = new JXG.Composition({ drag_point: pMid });
+
+            pMid.on('drag', () => {
+                pa.setAttribute({ rectY: pMid.Y() });
+            });
+
+            comp.setAttribute = attr => {
+                pMid.setAttribute(attr);
+                pLeft.setAttribute(attr);
+                pRight.setAttribute(attr);
+                pSegLeft.setAttribute(attr);
+                pSegHor.setAttribute(attr);
+                pSegRight.setAttribute(attr);
+            }
+
+            comp.removeFromBoard = () => {
+                board.removeObject(pSegRight);
+                board.removeObject(pSegHor);
+                board.removeObject(pSegLeft);
+                board.removeObject(pRight);
+                board.removeObject(pLeft);
+                board.removeObject(pMid);
+            }
+
+            return comp;
+        }
+
+        JXG.createRectangleWithDragPoint = createRectangleWithDragPoint;
+        JXG.registerElement('flexrect', JXG.createRectangleWithDragPoint);
+
+        /*board.create('flextriangle', [pa, pb, x, y], {});*/
+        function createTriangleWithDragPoint(board, parents, attributes) {
+
+            if (!JXG.exists(attributes)) attributes = {};
+
+            const pa = parents[0];
+            const pb = parents[1];
+            /* Restrict x position to be between endpoints */
+            const x = Math.min(Math.max(pa.X(), parents[2]), pb.X());
+            const y = parents[3];
+
+            const is_active = () => pa.getAttribute('strokeColor') && pa.getAttribute('strokeColor') == active_col;
+            const dep_col = () => is_active() ? active_col : normal_col;
+
+            const flextriangleSegStyle = { fixed: true, strokeWidth: 1, strokeColor: dep_col };
+
+            const pMid = board.create('point', [x, y], { visible: () => (active_section.pstart ? active_section.pstart.id : "") == pa.id, face: '^', size: 5, snapToGrid: true, snapSizeX: X_SNAP_SIZE, snapSizeY: Y_SNAP_SIZE });
+
+            const pMidDragRestrictHandler = () => {
+                board.suspendUpdate();
+                if (pMid.X() <= pa.X() || pMid.X() >= pb.X()) {
+                    const coordsRestricted = [Math.min(Math.max(pa.X(), pMid.X()), pb.X()), pMid.Y()];
+                    pMid.moveTo(coordsRestricted);
+                }
+                pa.setAttribute({ triangleX: pMid.X(), triangleY: pMid.Y() });
+                board.unsuspendUpdate();
+            }
+
+            pMid.on('drag', pMidDragRestrictHandler);
+            pa.on('drag', pMidDragRestrictHandler);
+            pb.on('drag', pMidDragRestrictHandler);
+
+            const pSegLeft = board.create('segment', [pa, pMid], { ...flextriangleSegStyle });
+            const pSegRight = board.create('segment', [pMid, pb], { ...flextriangleSegStyle });
+
+            const comp = new JXG.Composition({ drag_point: pMid });
+
+            comp.setAttribute = attr => {
+                pMid.setAttribute(attr);
+                pSegLeft.setAttribute(attr);
+                pSegRight.setAttribute(attr);
+            }
+
+            comp.removeFromBoard = () => {
+                board.removeObject(pSegRight);
+                board.removeObject(pSegLeft);
+                board.removeObject(pMid);
+            }
+
+            return comp;
+        }
+
+        JXG.createTriangleWithDragPoint = createTriangleWithDragPoint;
+        JXG.registerElement('flextriangle', JXG.createTriangleWithDragPoint);
+
+        /** Behelfsfunktion wegen Version 0.99.7 */
+        function changeVisibilityOfSlider(s, t) {
+            s.setAttribute({ visible: t, fixed: !t });
+            s.slider.setAttribute({ visible: t });
+            s.slider.baseline.setAttribute({ visible: t });
+            s.slider.ticks.setAttribute({ visible: t });
+            s.slider.highline.setAttribute({ visible: t });
+        }
+
+        /* frozen: true !!! */
+        function createInputSlider(board, parents, attributes) {
+            /* Attribute */
+            if (!JXG.exists(attributes)) attributes = {};
+            attributes.moveOnUp = false;
+            attributes.withLabel = false;
+
+            /* Slider */
+            const slider = board.create('slider', [parents[0], parents[1], parents[2]], attributes);
+            slider.baseline.point1.setAttribute({ frozen: true });
+            slider.baseline.point2.setAttribute({ frozen: true });
+
+            /* Input */
+            const input = board.create('input', [() => slider.point2.X() + 0.1, () => slider.point2.Y(), parseFloat(slider.Value().toFixed(4)), parents[3]], {
+                cssStyle: "width: 80px",
+            });
+            input.setAttribute({ frozen: true });
+
+            /* Data Attribut für Startwert */
+            input.rendNodeInput.setAttribute("data-sliderval", slider.Value());
+
+            /* Eventlistener Input DOM Element */
+            input.rendNodeInput.addEventListener("input", function (e) {
+                /*console.log(e.target.value);*/
+                /*console.log(Number(e.target.value));*/
+
+                /* Zahl? */
+                if (!Number(e.target.value) && Number(e.target.value) != 0) {
+                    console.log("The provided value must be a number");
+                    input.rendNodeInput.style.color = "fireBrick";
+                    slider.setValue(input.rendNodeInput.getAttribute("data-sliderval"));
+                    return;
+                }
+                /* Grenzwerte? */
+                if (Number(e.target.value) < slider._smin || Number(e.target.value) > slider._smax) {
+                    console.warn("The provided slider value is out of bounds");
+                    input.rendNodeInput.style.color = "fireBrick";
+                    slider.setValue(input.rendNodeInput.getAttribute("data-sliderval"));
+                    return;
+                }
+
+                /*console.log("change value");*/
+
+                input.rendNodeInput.style.color = "black";
+
+                /* Wert setzen */
+                slider.setValue(e.target.value);
+
+                /* Data Attribut mit Sliderwert setzen */
+                input.rendNodeInput.setAttribute("data-sliderval", e.target.value);
+
+                board.unsuspendUpdate();
+                isUpdateSuspended = false;
+                board.update();
+
+            });
+
+            /* Slider Eventlistener */
+            slider.on("drag", function () {
+                input.rendNodeInput.value = parseFloat(slider.Value().toFixed(4));
+                input.rendNodeInput.setAttribute("data-sliderval", parseFloat(slider.Value().toFixed(4)));
+            });
+
+            /* Komposition (Slider und Input) */
+            return new JXG.Composition({ slider: slider, input: input });
+        }
+
+        JXG.createInputSlider = createInputSlider;
+        JXG.registerElement('inputslider', JXG.createInputSlider);
+
+        const create_par_sliders = (board) => {
+            var sxmin = cca_xmin + 27 / 100 * Math.abs(cca_xmax - cca_xmin);
+            var sxmax = cca_xmin + 47 / 100 * Math.abs(cca_xmax - cca_xmin);
+            var syparA = cca_ymax - 1 / 6 * Math.abs(cca_ymax - cca_ymin);
+            var syparSx = cca_ymax - 3 / 6 * Math.abs(cca_ymax - cca_ymin);
+            var syparSy = cca_ymax - 5 / 6 * Math.abs(cca_ymax - cca_ymin);
+
+            const parA = board.create('inputslider', [[sxmin, syparA], [sxmax, syparA], [parAMin, parAInit, parAMax], "&nbsp;&nbsp;&nbsp;&nbsp;a = "], {});
+            const parSx = board.create('inputslider', [[sxmin, syparSx], [sxmax, syparSx], [parSxMin, parSxInit, parSxMax], "&nbsp;&nbsp;&nbsp;S<sub>x</sub> = "], {});
+            const parSy = board.create('inputslider', [[sxmin, syparSy], [sxmax, syparSy], [parSyMin, parSyInit, parSyMax], "&nbsp;&nbsp;&nbsp;S<sub>y</sub> = "], {});
+
+            for (const s of [parA, parSx, parSy]) {
+                changeVisibilityOfSlider(s, false);
+            }
+            /* TODO: Generalize code */
+            {
+                parA.slider.on('drag', () => {
+                    active_section.pstart.setAttribute({ parA: parA.slider.Value() });
+                });
+                parA.input.rendNodeInput.addEventListener("input", (e) => {
+                    active_section.pstart.setAttribute({ parA: parA.slider.Value() });
+                });
+                parSx.slider.on('drag', () => {
+                    active_section.pstart.setAttribute({ parSx: parSx.slider.Value() });
+                });
+                parSx.input.rendNodeInput.addEventListener("input", (e) => {
+                    active_section.pstart.setAttribute({ parSx: parSx.slider.Value() });
+                });
+                parSy.slider.on('drag', () => {
+                    active_section.pstart.setAttribute({ parSy: parSy.slider.Value() });
+                });
+                parSy.input.rendNodeInput.addEventListener("input", (e) => {
+                    active_section.pstart.setAttribute({ parSy: parSy.slider.Value() });
+                });
+            }
+
+            return { parA: parA, parSx: parSx, parSy: parSy };
+        };
+
+        const create_sine_sliders = (board) => {
+            var sxmin = cca_xmin + 27 / 100 * Math.abs(cca_xmax - cca_xmin);
+            var sxmax = cca_xmin + 47 / 100 * Math.abs(cca_xmax - cca_xmin);
+            var sysineA = cca_ymax - 1 / 6 * Math.abs(cca_ymax - cca_ymin);
+            var sysineF = cca_ymax - 3 / 6 * Math.abs(cca_ymax - cca_ymin);
+            var sysinePhi = cca_ymax - 5 / 6 * Math.abs(cca_ymax - cca_ymin);
+
+            const sineA = board.create('inputslider', [[sxmin, sysineA], [sxmax, sysineA], [sineAMin, sineAInit, sineAMax], "&nbsp;&nbsp;&nbsp;A = "], {});
+            const sineF = board.create('inputslider', [[sxmin, sysineF], [sxmax, sysineF], [sineFMin, sineFInit, sineFMax], "&nbsp;&nbsp;&nbsp;&nbsp;f = "], {});
+            const sinePhi = board.create('inputslider', [[sxmin, sysinePhi], [sxmax, sysinePhi], [sinePhiMin, sinePhiInit, sinePhiMax], "&nbsp;&nbsp;&nbsp;&phi; = "], {});
+
+            for (const s of [sineA, sineF, sinePhi]) {
+                changeVisibilityOfSlider(s, false);
+            }
+            /* TODO: Generalize code */
+            {
+                sineA.slider.on('drag', () => {
+                    active_section.pstart.setAttribute({ sineA: sineA.slider.Value() });
+                });
+                sineA.input.rendNodeInput.addEventListener("input", (e) => {
+                    active_section.pstart.setAttribute({ sineA: sineA.slider.Value() });
+                });
+                sineF.slider.on('drag', () => {
+                    active_section.pstart.setAttribute({ sineF: sineF.slider.Value() });
+                });
+                sineF.input.rendNodeInput.addEventListener("input", (e) => {
+                    active_section.pstart.setAttribute({ sineF: sineF.slider.Value() });
+                });
+                sinePhi.slider.on('drag', () => {
+                    active_section.pstart.setAttribute({ sinePhi: sinePhi.slider.Value() });
+                });
+                sinePhi.input.rendNodeInput.addEventListener("input", (e) => {
+                    active_section.pstart.setAttribute({ sinePhi: sinePhi.slider.Value() });
+                });
+            }
+
+            return { sineA: sineA, sineF: sineF, sinePhi: sinePhi };
+        };
+
+        const getMouseCoords = (e, i, board) => {
+            return new JXG.Coords(JXG.COORDS_BY_SCREEN, board.getMousePosition(e, i), board);
+        }
+
+        const p_down_handler = (board, p, p_cca) => (() => {
+            /*console.log("down on p " + p.id + " with mode " + p.getAttribute('mode'));*/
+            p_cca.moveTo([p.getAttribute('mode'), p_cca.Y()]);
+            active_section.disconnect_sliders();
+            active_section = graph.sections.find(section => section.pstart == p);
+            active_section.connect_sliders();
+
+            board.unsuspendUpdate();
+            isUpdateSuspended = false;
+        });
+
+        const board_down_handler = (e, board, p_cca) => {
+            board.suspendUpdate();
+            var canCreate = true,
+                i, coords, el;
+
+            if (e[JXG.touchProperty]) {
+                /* index of the finger that is used to extract the coordinates*/
+                i = 0;
+            }
+            coords = getMouseCoords(e, i, board);
+            for (el in board.objects) {
+                let p = board.objects[el];
+                if (JXG.isPoint(p) && p.hasPoint(coords.scrCoords[1], coords.scrCoords[2])) {
+                    canCreate = false;
+                    /* click on an existing point happened*/
+                    if (e.button == 2 && gt_points.includes(p)) {
+                        if (p.id == gt_points[0].id || p.id == gt_points[gt_points.length - 1].id) return;
+                        active_section.disconnect_sliders();
+                        const idx_bef = graph.get_index_before(p);
+                        graph.removeFromBoard();
+                        gt_points = gt_points.filter(item => item !== p);
+                        graph = create_initial_graph(board);
+                        active_section = graph.sections[Math.max(0, idx_bef)];
+                        active_section.connect_sliders();
+                        p_cca.moveTo([active_section.pstart.getAttribute('mode'), p_cca.Y()]);
+                        board.removeObject(p);
+                    }
+                }
+            }
+            if (canCreate) {
+                /*if (!e.shiftKey && e.button != 2 && coords.scrCoords[1] > gt_points[0].coords.scrCoords[1] && coords.scrCoords[1] < gt_points[gt_points.length - 1].coords.scrCoords[1]) {*/
+                if (!e.shiftKey && e.button != 2 && coords.usrCoords[2] < board.getBoundingBox()[1] && coords.usrCoords[2] > board.getBoundingBox()[3] + 0.25 * Math.abs(board.getBoundingBox()[1] - board.getBoundingBox()[3]) && coords.scrCoords[1] > gt_points[0].coords.scrCoords[1] && coords.scrCoords[1] < gt_points[gt_points.length - 1].coords.scrCoords[1]) {
+                    let p_coords = [coords.usrCoords[1], Math.min(coords.usrCoords[2], 0.9 * board.getBoundingBox()[1])];
+                    let p = board.create('point', p_coords, { mode: 0, triangleX: triangleXInit, triangleY: triangleYInit, rectY: rectYInit, sineA: sineAInit, sineF: sineFInit, sinePhi: sinePhiInit, parA: parAInit, parSx: parSxInit, parSy: parSyInit, ...gt_pstyle });
+                    p_cca.moveTo([p.getAttribute('mode'), p_cca.Y()]);
+                    p.setAttribute({ color: () => p == active_section.pstart ? active_col : normal_col });
+                    p.on('down', p_down_handler(board, p, p_cca));
+                    var p_idx = 0;
+                    /* put p into points*/
+                    for (let i = 1; i < gt_points.length; i++) {
+                        if (p.X() <= gt_points[i].X()) {
+                            gt_points.splice(i, 0, p);
+                            p_idx = i;
+                            break;
+                        }
+                    }
+
+                    /* now for new points, the triangle x position can be calculated */
+                    /* TODO: this is confusing to do the next line exactly here */
+                    /* TODO: the endpoints have to be handled specifically, triangleX is still triangleXInit for endpoints */
+                    /*
+                    if (p_idx + 1 < gt_points.length) {
+                        p.setAttribute({ triangleX: p_coords[0] + (gt_points[p_idx + 1].X() - p_coords[0]) / 2 });
+                    }
+                    */
+
+                    /* redraw graph */
+                    active_section.disconnect_sliders();
+                    graph.removeFromBoard();
+                    graph = create_initial_graph(board);
+                    active_section = graph.sections.find(section => section.pstart == p);
+                    active_section.connect_sliders();
+                    /* get direct neighbours of p */
+                    let pNext = null;
+                    let pBefore = null;
+                    for (let i = 1; i < gt_points.length - 1; i++) {
+                        if (gt_points[i] == p) {
+                            pNext = gt_points[i + 1];
+                            pBefore = gt_points[i - 1];
+                            break;
+                        }
+                    }
+                    /* restrict drag zone by direct neighbours */
+                    p.on('drag', () => {
+                        if (e.button == 2) return;
+                        const suspState = isUpdateSuspended;
+                        board.suspendUpdate();
+                        isUpdateSuspended = true;
+                        let aftX = xmax;
+                        let befX = xmin;
+                        for (let i = 1; i < gt_points.length; i++) {
+                            if (gt_points[i].id == p.id) {
+                                aftX = gt_points[i + 1].X();
+                                befX = gt_points[i - 1].X();
+                                break;
+                            }
+                        }
+                        /* TODO: make it configurable to not only use x- but also use y-restriction; use commented code; */
+                        /*const yMinLimit = -1.4 * ymax;*/
+                        /*const yMaxLimit = 1.4 * ymax;*/
+                        /*const pRestricted = [Math.min(Math.max(befX, p.X()), aftX), Math.min(Math.max(p.Y(), yMinLimit), yMaxLimit)];*/
+
+                        /* Restrict x position of point*/
+                        const pRestricted = [Math.min(Math.max(befX, p.X()), aftX), p.Y()];
+                        if (p.X() <= befX || p.X() >= aftX) {
+                            p.moveTo(pRestricted);
+                        }
+                        /*else if (p.Y() <= yMinLimit || p.Y() >= yMaxLimit) {
+                            p.moveTo(pRestricted);
+                        }*/
+                        if (suspState) {
+                            board.unsuspendUpdate();
+                            board.update();
+                            board.suspendUpdate();
+                        } else {
+                            board.unsuspendUpdate();
+                        }
+                        isUpdateSuspended = suspState;
+                    });
+                }
+
+            }
+            board.unsuspendUpdate();
+            isUpdateSuspended = false;
+        };
+
+        const convertDataToPointList = (data, tmin, tmax) => {
+
+            var output = Array(tmax - tmin + 1);
+
+            for (let i = 1; i < data.length; i++) {
+                const sec = data[i - 1];
+                const nextSec = data[i];
+                const pa = { x: sec[0], y: sec[1] };
+                const pb = { x: nextSec[0], y: nextSec[1] };
+                const start = Math.round(pa.x); /* TODO vorher: floor */
+                const end = Math.round(pb.x); /* TODO vorher: floor */
+                const secType = sec[2];
+                if (secType === 0) { /* line */
+                    var dx = pb.x - pa.x;
+                    dx = dx === 0 ? 0.0001 : dx;
+                    const m = (pb.y - pa.y) / dx;
+                    const t = pa.y - m * pa.x;
+                    const g = (x) => m * x + t;
+                    for (let i = start; i < end; i++) {
+                        output[i] = g(i);
+                    }
+                } else if (secType === 1) { /* rectangle */
+                    var rectY = sec[5];
+
+                    for (let i = start; i < end; i++) {
+                        output[i] = rectY;
+                    }
+                } else if (secType === 2) { /* triangle */
+                    var pMid = { x: sec[3], y: sec[4] };
+                    const middle = Math.floor(pMid.x);
+
+                    var dxLeft = pMid.x - pa.x;
+                    dxLeft = dxLeft === 0 ? 0.0001 : dxLeft;
+                    const mLeft = (pMid.y - pa.y) / dxLeft;
+                    const tLeft = pa.y - mLeft * pa.x;
+                    const gLeft = (x) => mLeft * x + tLeft;
+                    for (let i = start; i < middle; i++) {
+                        output[i] = gLeft(i);
+                    }
+
+                    var dxRight = pMid.x - pa.x;
+                    dxLeft = dxRight === 0 ? 0.0001 : dxRight;
+                    const mRight = (pb.y - pMid.y) / dxRight;
+                    const tRight = pMid.y - mRight * pb.x;
+                    const gRight = (x) => mRight * x + tRight;
+                    for (let i = middle; i < end; i++) {
+                        output[i] = gRight(i);
+                    }
+
+                } else if (secType === 3) { /* parabola */
+                    for (let i = start; i < end; i++) {
+                        const a = sec[9];
+                        const sx = sec[10];
+                        const sy = sec[11];
+                        output[i] = i, a * (i - sx) ** 2 + sy;
+                    }
+                } else if (secType === 4) { /* sine wave */
+                    for (let i = start; i < end; i++) {
+                        const A = sec[6];
+                        const f = sec[7];
+                        const phi = sec[8];
+                        output[i] = A * Math.sin(2 * Math.PI * f * i - phi * Math.PI / 180.0);
+                    }
+
+                } else {
+                    console.log("unimplemented secType == " + secType);
+                }
+
+            }
+
+            return output;
+        }
+
+        const storeFeedback = () => {
+            //console.log("ta: " + ta);
+            var sans = convertDataToPointList(allData, xmin, xmax);
+            var tans = ta;
+            var diff = [];
+            var errIndices = [];
+            //var maxAmp = 0;
+            for (let i = 0; i < tans.length; i++) {
+                //maxAmp = Math.max(maxAmp, Math.abs(tans[i]));
+                diff[i] = Math.abs(tans[i] - sans[i]);
+            };
+            const epsErr = 1 / 15 * ymax;
+            for (let i = 0; i < diff.length; i++) {
+                if (diff[i] < epsErr) {
+                    /* do nothing */
+                } else {
+                    /*console.log("diff["+i+"]: "+diff[i]);*/
+                    if (i > xmin && i < xmax - 1) {
+                        /*if (Math.abs(tans[i - 1] - sans[i]) > epsErr && Math.abs(tans[i + 1] - sans[i]) > epsErr) {*/
+                        if (Math.abs(tans[i + 1] - sans[i]) > epsErr) {
+                            errIndices.push(i);
+                        }
+                    } else if (i > xmin) {
+                        if (Math.abs(tans[i - 1] - sans[i]) > epsErr) {
+                            errIndices.push(i);
+                        }
+                    } else if (i < xmax - 1) {
+                        if (Math.abs(tans[i + 1] - sans[i]) > epsErr) {
+                            errIndices.push(i);
+                        }
+                    }
+                }
+            }
+            const ans2 = document.getElementById(ans2Ref);
+            ans2.value = JSON.stringify(errIndices);
+            ans2.dispatchEvent(new Event('change'));
+        }
+
+        const storeState = () => {
+            for (let i = 0; i < gt_points.length; i++) {
+                const gt_point = gt_points[i];
+                allData[i] = [gt_point.X(), gt_point.Y()];
+                allData[i][2] = gt_point.getAttribute('mode');
+                allData[i][3] = gt_point.getAttribute('triangleX');
+                allData[i][4] = gt_point.getAttribute('triangleY');
+                allData[i][5] = gt_point.getAttribute('rectY');
+                allData[i][6] = gt_point.getAttribute('sineA');
+                allData[i][7] = gt_point.getAttribute('sineF');
+                allData[i][8] = gt_point.getAttribute('sinePhi');
+                allData[i][9] = gt_point.getAttribute('parA');
+                allData[i][10] = gt_point.getAttribute('parSx');
+                allData[i][11] = gt_point.getAttribute('parSy');
+            }
+            const ans1 = document.getElementById(ans1Ref);
+            ans1.value = JSON.stringify(allData);
+            ans1.dispatchEvent(new Event('change'));
+
+            storeFeedback();
+        };
+        /* END OF function definitions */
+        /*******************************/
+
+        /*********************************/
+        /*        MAIN FUNCTION          */
+        /* Returns the graph tool for e8 */
+        function create_gt_for_e8() {
+
+            /* Creation of board */
+            /* TODO: Make configurable */
+            const board = create_gt_board(divid, gt_bbox);
+
+            board.suspendUpdate();
+            isUpdateSuspended = true;
+
+            /* TODO: Make configurable */
+            const xaxis = create_xaxis(board);
+            const yaxis = create_yaxis(board);
+
+            /* Creation of controls area */
+            const controls_area = create_controls_area(board);
+            const p_cca = board.create('point', [0, -10000], { visible: false, size: 0 });
+            const section_text = create_section_text(board, p_cca);
+
+            /* Retrieve points from state */
+            gt_points = [];
+            let ansGt1 = document.getElementById(ans1Ref).value;
+            var p_start, p_end;
+            if (ansGt1.length > 0) {
+                let ssa = JSON.parse(ansGt1); /* stored state array */
+                if (ssa.length > 1) {
+                    for (let i = 0; i < ssa.length; i++) {
+                        let ssec = ssa[i]; /* stored section */
+                        let p = board.create('point', [ssec[0], ssec[1]], {
+                            mode: ssec[2],
+                            triangleX: ssec[3],
+                            triangleY: ssec[4],
+                            rectY: ssec[5],
+                            sineA: ssec[6],
+                            sineF: ssec[7],
+                            sinePhi: ssec[8],
+                            parA: ssec[9],
+                            parSx: ssec[10],
+                            parSy: ssec[11],
+                            ...gt_pstyle
+                        });
+
+                        gt_points.push(p);
+                    }
+
+
+                    for (let i = 0; i < gt_points.length - 1; i++) {
+
+                        let p = gt_points[i];
+
+                        p_cca.moveTo([p.getAttribute('mode'), p_cca.Y()]);
+                        p.setAttribute({ color: () => p == (active_section ? active_section.pstart : null) ? active_col : normal_col });
+                        p.on('down', p_down_handler(board, p, p_cca));
+
+                        /* restrict drag zone by direct neighbours */
+                        p.on('drag', () => {
+                            const suspState = isUpdateSuspended;
+                            board.suspendUpdate();
+                            isUpdateSuspended = true;
+                            let aftX = xmax;
+                            let befX = xmin;
+                            for (let i = 1; i < gt_points.length; i++) {
+                                if (gt_points[i].id == p.id) {
+                                    aftX = gt_points[i + 1].X();
+                                    befX = gt_points[i - 1].X();
+                                    break;
+                                }
+                            }
+
+                            /* Restrict x position of point*/
+                            const pRestricted = [Math.min(Math.max(befX, p.X()), aftX), p.Y()];
+                            if (p.X() <= befX || p.X() >= aftX) {
+                                p.moveTo(pRestricted);
+                            }
+                            if (suspState) {
+                                board.unsuspendUpdate();
+                                board.update();
+                                board.suspendUpdate();
+                            } else {
+                                board.unsuspendUpdate();
+                            }
+                            isUpdateSuspended = suspState;
+                        });
+                    }
+                    p_start = gt_points[0];
+                    p_start.makeGlider(board.create('line', [[p_start.X(), 0], [p_start.X(), 1]], { visible: false, highlight: false, fixed: true, ...endpoint_style }));
+                    p_start.on('down', p_down_handler(board, p_start, p_cca));
+                    p_end = gt_points[gt_points.length - 1];
+                    p_end.makeGlider(board.create('line', [[p_end.X(), 0], [p_end.X(), 1]], { visible: false, highlight: false, fixed: true, ...endpoint_style }));
+
+                } else {
+                    /* TODO: Make configurable */
+                    /* Initialisation of start and end points */
+                    p_start = board.create('point', [xmin, (ymin + ymax) / 2], { ...endpoint_style, ...gt_pstyle });
+                    p_start.makeGlider(board.create('line', [[p_start.X(), 0], [p_start.X(), 1]], { visible: false, highlight: false, fixed: true }));
+                    p_start.on('down', p_down_handler(board, p_start, p_cca));
+                    p_end = board.create('point', [xmax, (ymin + ymax) / 2], { ...endpoint_style, ...gt_pstyle });
+                    p_end.makeGlider(board.create('line', [[p_end.X(), 0], [p_end.X(), 1]], { visible: false, highlight: false, fixed: true }));
+
+                    /* Creation of initial graph and sliders */
+                    gt_points = [p_start, p_end];
+                }
+            }
+
+            graph = create_initial_graph(board);
+            sliders = { ...create_par_sliders(board), ...create_sine_sliders(board) };
+            drag_points = {};
+
+            /* Initial activation of the first section */
+            active_section = graph.sections[0];
+            active_section.connect_sliders();
+            p_start.setAttribute({ color: () => (p_start == active_section.pstart ? active_col : endpoint_col) });
+            p_end.setAttribute({ color: () => endpoint_col });
+
+            const switch_button = create_switch_button(board, p_cca);
+
+            board.on('down', (e) => board_down_handler(e, board, p_cca));
+            board.on('update', storeState);
+
+
+let cursorSize = 5;
+let cursorStyle = { size: cursorSize, highlight: false, showInfobox: false, withLabel: false, strokeColor: 'gray', strokeOpacity: 1.0, fillColor: 'gray', fillOpacity: 0.2, label: { fontSize: '14px', position: 'top', cssStyle: 'backgroundColor: white; padding: 2px; borderRadius: 0px; border: 1px solid black;' } };
+let cursorCrossStyle = { size: cursorSize, highlight: false, showInfobox: false, visible: true, dash: 0, strokeOpacity: 1, strokeColor: 'black', strokeWidth: 1, face: 'plus' };
+let cursorLongCrossStyle = { visible: false, dash: 2, strokeOpacity: 0.6, strokeColor: 'gray', strokeWidth: 1 };
+
+function createCursor(board, x, y, name) {
+    let cursor = board.create('point', [x, y], { ...cursorStyle, name: name });
+
+    let cursorLongCrossHor = board.create('line', [[-10, () => cursor.Y()], [10, () => cursor.Y()]], { ...cursorLongCrossStyle });
+    let cursorLongCrossVer = board.create('line', [[() => cursor.X(), -10], [() => cursor.X(), 10]], { ...cursorLongCrossStyle });
+    let cursorLongCross = { hor: cursorLongCrossHor, ver: cursorLongCrossVer, show: (t) => { cursorLongCrossHor.setAttribute({ visible: t }); cursorLongCrossVer.setAttribute({ visible: t }); } };
+    cursorLongCross.show(true);
+
+    let cursorCross = board.create('point', [() => cursor.X(), () => cursor.Y()], { ...cursorCrossStyle });
+
+    cursor.on("over", () => {
+        cursor.setAttribute({ withLabel: true });
+    });
+    cursor.on("out", () => {
+        cursor.setAttribute({ withLabel: false });
+    });
+    return cursor;
+}
+
+let b1xAtPlusOne = board.create('segment', [[0, 1], [tmax, 1]], { visible: false, highlight: false });
+let b1xAtMinusOne = board.create('segment', [[0, -1], [tmax, -1]], { visible: false, highlight: false });
+let b1getCursorName = () => '( <em>t</em> = ' + b1cursor.X().toFixed(1) + ' &mu;s )';
+let b1cursor = createCursor(board, Math.round(xmax / 2), ymax, b1getCursorName);
+stack_jxg.bind_point(ansCursorRef, b1cursor);
+b1cursor.setAttribute({ snapToGrid: true, snapSizeX: 0.01, snapSizeY: 0.01 });
+
+var drawModelSolution = (board) => {
+    var modelSolution = {#ta1Draw#};
+    var modelSolutionPoints = [];
+    for (var i = 0; i < modelSolution.length; i = i + 1) {
+        modelSolutionPoints.push(board.create("point", modelSolution[i], { visible: false }));
+    }
+    for (var i = 0; i < modelSolutionPoints.length - 1; i = i + 1) {
+        board.create("segment", [modelSolutionPoints[i], modelSolutionPoints[i + 1]], { dash: 1, color: JXG.paletteWong.bluishgreen, fixed: true, highlight: false, strokeWidth: 3, withLabel: false });
+    }
+    board.update();
+};
+
+/* Show model solution in green dashed line if answer was right for comparison */
+var taNotDrawn = true;
+
+var tryToDrawModelSolution = (board, timeout) => {
+    setTimeout(() => {
+        if(!taNotDrawn) return;
+var promiseforaninput = stack_js.request_access_to_input("ansModelSolution1", true);
+promiseforaninput.then((id) => {
+   var input = document.getElementById(id);
+   var parsedInput = JSON.parse(input.value);
+   if(parsedInput == true) {
+      drawModelSolution(board);
+      taNotDrawn = false;     
+   }
+});
+    }, timeout);
+};
+
+for(let timeout of [1000, 2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 32000]) {
+    tryToDrawModelSolution(board, timeout);
+}
+
+
+            board.unsuspendUpdate();
+
+            board.update();
+        }
+        /* END OF MAIN FUNCTION */
+        /************************/
+
+        /* START OF main program */
+        create_gt_for_e8();
+        /* END OF main program */
+
+[[/jsxgraph]]
+
+<p hidden>[[input:ansPg1]] [[validation:ansPg1]]</p>
+<p hidden>[[input:ansErr1]] [[validation:ansErr1]]</p>
+<p>[[feedback:prt1]]</p>
+    </div>
+</details>
+
+<!--
+#################################
+#################################
+#################################
+-->
+
+<p>&nbsp;</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2023121100</text>
+    </stackversion>
+    <questionvariables>
+      <text>/* Created by Johannes Knaut, OTH Amberg-Weiden */
+/* Last date of change: 08/04/2025 */
+/* Minimal example; not in the options-format yet; only minimal feedback; */
+
+tmin: 0;
+tmax: 100;
+ta1: 
+[0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+taPg1: [[0,0,1,1,1,0,1,0,0,0,20,0],
+[10,1,1,-1,-1,1,11,1,0,0,10,0],
+[30,0,1,-1,-1,0,11,0,0,0,10,0],
+[50,1,1,-1,-1,1,11,1,0,0,10,0],
+[70,0,1,-1,-1,0,11,0,0,0,10,0],
+[100,0,0,-1,-2,0,0,0,0,0.0001,100,0]];
+ta1Draw: float([[0, 0], [10, 0], [10, 1], [30, 1], [30, 0], [50, 0], [50, 1], [70, 1], [70, 0], [100, 0]]);</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text></text>
+    </specificfeedback>
+    <questionnote>
+      <text></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text>Correct answer, well done!</text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text>Your answer is partly correct.</text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text>Wrong answer.</text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ansCursor</name>
+      <type>algebraic</type>
+      <tans>[round((tmax-tmin)/2), 0.5]</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>[round((tmax-tmin)/2), 0.5]</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ansErr1</name>
+      <type>algebraic</type>
+      <tans>[]</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>[]</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ansModelSolution1</name>
+      <type>algebraic</type>
+      <tans>false</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>false</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ansPg1</name>
+      <type>algebraic</type>
+      <tans>taPg1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>[]</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text>mansErr: ansErr1;
+mansErrLen: length(mansErr);
+bestErrLen: 5;</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>GT</answertest>
+        <sans>bestErrLen</sans>
+        <tans>mansErrLen</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p id="ideal-c9-inverswandler-prt1-corr">Your answer has high accuracy.</p>
+<p>Additionally, the exact solution is shown in green. Please compare it with your answer.</p>
+[[javascript]]
+var promiseforaninput = stack_js.request_access_to_input("ansModelSolution1", true);
+promiseforaninput.then((id) => {
+   var input = document.getElementById(id);
+   var parsedInput = JSON.parse(input.value);
+   parsedInput = true;
+   input.value = JSON.stringify(parsedInput);
+   const msg = new Event('change');
+   input.dispatchEvent(msg);
+});
+[[/javascript]]]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>
