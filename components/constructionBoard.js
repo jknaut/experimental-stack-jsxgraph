@@ -696,6 +696,7 @@ var createConstructionBoard = (userOptions = {}) => {
         }
 
     } else if (options.showStaticSynchronousSOK) {
+        const solSOKStyle = { strokeColor: Colors.blue, strokeWidth: 3 };
         board.create('circle', [options.sok_ctr, options.sok_rad], { ...solSOKStyle });
     }
 
