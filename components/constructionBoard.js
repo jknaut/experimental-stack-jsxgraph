@@ -1,9 +1,9 @@
 /** Creates a JSXGraph board (inside an empty STACK jsxgraph-block) to construct a circle diagram, to plot an operating point, or to construct a phasor diagram.
  * Example of how to use the function in STACK:
  * 1) Use the following jsxgraph-block for the circle diagram and the operating point:
- * [[jsxgraph width="600px" height="600px" input-ref-ansAxisLabels="ansAxisLabelsRef" input-ref-ansSOK="ansSOKRef" input-ref-ansStateStorage="ansStateStorageRef" input-ref-ansBP="ansBPRef"]]
+ * [ [ jsxgraph width="600px" height="600px" input-ref-ansAxisLabels="ansAxisLabelsRef" input-ref-ansSOK="ansSOKRef" input-ref-ansStateStorage="ansStateStorageRef" input-ref-ansBP="ansBPRef"]]
  * ...
- * [[/jsxgraph]]
+ * [ [/jsxgraph]]
  * 2) Create the following input fields in STACK:
  * ansAxisLabels: algebraic input with model solution [1, 4],
  * ansSOK: algebraic input with syntax hint and model solution ["-1", [], -1],
