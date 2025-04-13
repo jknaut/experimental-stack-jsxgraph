@@ -576,9 +576,9 @@ var createConstructionBoard = (userOptions = {}) => {
             if (i % 2 == 1) {
                 vecs[j] = board.create("arrow", [ps[i - 1], ps[i]], { ...vecStyle, withLabel: false, color: col1 });
                 j = j + 1;
+                var mp = board.create("midpoint", [ps[i-1], ps[i]], {visible: false, highlight: false, size: 0});
+                var mpLabel = board.create("text", [() => mp.X(), () => mp.Y(), vecLabels[j]], {anchorX: 'middle', anchorY: 'middle', color: "white", cssStyle: `background-color: ${collight1}; padding: 2px 4px; border-radius: 4px;`});
             }
-            var mp = board.create("midpoint", [ps[i-1], ps[i]], {visible: false, highlight: false, size: 0});
-            var mpLabel = board.create("text", [() => mp.X(), () => mp.Y(), vecLabels[j]], {anchorX: 'middle', anchorY: 'middle', color: "white", cssStyle: `background-color: ${collight1}; padding: 2px 4px; border-radius: 4px;`});
         }
         var midpoints = [];
         var texts = [];
