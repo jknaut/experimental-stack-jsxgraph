@@ -1,0 +1,57 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+  <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+
+
+</head>
+
+<body>
+
+  <!--
+<input type="hidden" id="ansAxisLabels" value=""></input>
+<input type="hidden" id="ansSOK" value="[&quot;-1&quot;,[],-1]"></input>
+<input type="hidden" id="ansStateStorage" value="{&quot;objMap&quot;:[],&quot;selectedID&quot;:null,&quot;sokID&quot;:&quot;-1&quot;,&quot;bpID&quot;:&quot;-1&quot;}"></input>
+<input type="hidden" id="ansBP" value="[&quot;-1&quot;,[],[]]"></input>
+-->
+
+  <div id="divid" style="width: 600px; height: 600px;"></div>
+
+
+  <input id="ansAxisLabelsRef" value="[1,4]">
+  <input id="ansZDRef" value="">
+  <input id="ansStateStorageRef" value='""'>
+
+
+  <script>
+    var ansAxisLabelsRef = "ansAxisLabelsRef";
+    var ansZDRef = "ansZDRef";
+    var ansStateStorageRef = "ansStateStorageRef";
+
+    window.stack_jxg = window.stack_jxg || {};
+    stack_jxg.bind_point = function (x, y) {
+      console.log(`Mocked bind_point called with x=${x}, y=${y}`);
+      // Return whatever you expect in your code
+      return { x, y, mocked: true };
+    };
+  </script>
+  <script src="../components/constructionBoard.js"></script>
+  <script type="text/javascript">
+
+
+    var params = {
+      useMathJax: true,
+      withPhasorDiagram: true,
+      tapePrecision: 2,
+      withVectorButton: false,
+      checkSOK: false,
+      checkBP: false,
+    };
+
+    createConstructionBoard(params);
+  </script>
+</body>
+
+</html>
