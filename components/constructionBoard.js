@@ -27,9 +27,14 @@ var createConstructionBoard = (userOptions = {}) => {
         tapePrecision: 1,
 
         withPhasorDiagram: false,
+        showPhasorSolution: false,
         vecPositions: [[-9, 11], [-6, 11], [-9, 10], [-6, 10], [-9, 9], [-6, 9], [-9, 8], [-6, 8], [-9, 7], [-6, 7], [-9, 6], [-6, 6], [-9, 5], [-6, 5], [-9, 4], [-6, 4]],
         vecLabels: ["\\(\\underline{U}_1\\)", "\\(\\underline{I}_1\\)", "\\(\\underline{U}_P\\)", "\\(\\underline{I}_{\\mu}\\)", "\\(\\underline{I}'_E\\)", "\\(\\underline{U}_r\\)", "\\(-j X_{1\\sigma} \\cdot \\underline{I}_1\\)", "\\(-j X_h \\cdot \\underline{I}_1\\)"],
         useMathJax: false,
+
+        showStaticSynchronousSOK: false,
+        sok_ctr: [0, 0],
+        sok_rad: 5,
 
         showStaticAsyncSOK: false,
         xInenncm: 1.67,
@@ -577,8 +582,8 @@ var createConstructionBoard = (userOptions = {}) => {
             ps[i] = board.create("point", pCoords[i], { ...vecPointStyle, withLabel: false });
             if (i % 2 == 1) {
                 vecs[j] = board.create("arrow", [ps[i - 1], ps[i]], { ...vecStyle, withLabel: false, color: col1 });
-                mps[i] = board.create("midpoint", [ps[i-1], ps[i]], {visible: false, highlight: false, size: 0});
-                mpLabels[i] = board.create("text", [() => mps[i].X(), () => mps[i].Y(), vecLabels[j]], {anchorX: 'left', anchorY: 'middle', color: "white", cssStyle: `background-color: ${collight1}; padding: 2px 4px; border-radius: 4px;`});
+                mps[i] = board.create("midpoint", [ps[i - 1], ps[i]], { visible: false, highlight: false, size: 0 });
+                mpLabels[i] = board.create("text", [() => mps[i].X(), () => mps[i].Y(), vecLabels[j]], { anchorX: 'left', anchorY: 'middle', color: "white", cssStyle: `background-color: ${collight1}; padding: 2px 4px; border-radius: 4px;` });
                 j = j + 1;
             }
         }
@@ -600,7 +605,10 @@ var createConstructionBoard = (userOptions = {}) => {
             ps[2 * j + 1].on("mouseover", () => { texts[j].setAttribute({ visible: true }); });
             ps[2 * j + 1].on("mouseout", () => { texts[j].setAttribute({ visible: false }); });
         }
-        stack_jxg.bind_list_of(ansZDRef, ps);
+        if (options.showPhasorSolution) {
+        } else {
+            stack_jxg.bind_list_of(ansZDRef, ps);
+        }
     }
 
 
@@ -687,9 +695,9 @@ var createConstructionBoard = (userOptions = {}) => {
             musterElements[i].setAttribute({ fixed: true, strokeOpacity: 0.7, fillOpacity: 0.7, highlight: false });
         }
 
+    } else if (options.showStaticSynchronousSOK) {
+        board.create('circle', [options.sok_ctr, options.sok_rad], { ...solSOKStyle });
     }
-
-
 
 
 
