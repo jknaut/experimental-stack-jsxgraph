@@ -37,6 +37,9 @@ var createConstructionBoard = (userOptions = {}) => {
         sok_rad: 5,
         showSyncSOKDetails: false,
 
+        showBP: false,
+        bpCoords: [0, 0],
+
         showStaticAsyncSOK: false,
         xInenncm: 1.67,
         yInenncm: -0.9,
@@ -702,6 +705,9 @@ var createConstructionBoard = (userOptions = {}) => {
         if(options.showSyncSOKDetails) {
             board.create('point', options.sok_ctr, { withLabel: true, name: () => "x = " + options.sok_ctr[0].toFixed(2) + " cm" });
             board.create('segment', [options.sok_ctr, [options.sok_ctr[0], options.sok_ctr[1] + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
+        }
+        if(options.showBP) {
+            board.create('arrow', [[0, 0], bpCoords], {withLabel: true, name: () => "Teilaufgabe c"});
         }
     }
 
