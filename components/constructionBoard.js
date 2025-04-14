@@ -710,7 +710,7 @@ var createConstructionBoard = (userOptions = {}) => {
             var pOrig = board.create('point', [0, 0], {visible: false});
             var pYOne = board.create('point', [0, 1], {visible: false});
             var pBP = board.create('point', options.bpCoords, {visible: false});
-            board.create('arrow', [pOrig, pBP], {withLabel: true, name: () => "Teilaufgabe c"});
+            board.create('arrow', [pOrig, pBP], {withLabel: true, name: () => "Teil (c)"});
             board.create('angle', [pYOne, pOrig, pBP], {withLabel: true, radius: 2, name: function() {
                 return JXG.Math.Geometry.trueAngle([0, 1], [0, 0], options.bpCoords).toFixed(1) + '°';
             }});
