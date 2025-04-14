@@ -701,7 +701,7 @@ var createConstructionBoard = (userOptions = {}) => {
         board.create('circle', [options.sok_ctr, options.sok_rad], { ...solSOKStyle });
         if(options.showSyncSOKDetails) {
             board.create('point', options.sok_ctr, { withLabel: false });
-            board.create('segment', [options.sok_ctr, [options.sok_ctr.X(), options.sok_ctr.X() + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
+            board.create('segment', [options.sok_ctr, [options.sok_ctr[1], options.sok_ctr[1] + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
         }
     }
 
