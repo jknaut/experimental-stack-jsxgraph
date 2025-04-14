@@ -708,6 +708,9 @@ var createConstructionBoard = (userOptions = {}) => {
         }
         if(options.showBP) {
             board.create('arrow', [[0, 0], options.bpCoords], {withLabel: true, name: () => "Teilaufgabe c"});
+            board.create('angle', [[0, 1], [0, 0], options.bpCoords], {withLabel: true, name: function() {
+                return JXG.Math.Geometry.trueAngle([0, 1], [0, 0], options.bpCoords).toFixed(1) + '°';
+            }});
         }
     }
 
