@@ -707,8 +707,11 @@ var createConstructionBoard = (userOptions = {}) => {
             board.create('segment', [options.sok_ctr, [options.sok_ctr[0], options.sok_ctr[1] + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
         }
         if(options.showBP) {
-            board.create('arrow', [[0, 0], options.bpCoords], {withLabel: true, name: () => "Teilaufgabe c"});
-            board.create('angle', [[0, 1], [0, 0], options.bpCoords], {withLabel: true, name: function() {
+            var pOrig = board.create('point', [0, 0], {visible: false});
+            var pYOne = board.create('point', [0, 1], {visible: false});
+            var pBP = board.create('point', options.bpCoords, {visible: false});
+            board.create('arrow', [pOrig, pBP], {withLabel: true, name: () => "Teilaufgabe c"});
+            board.create('angle', [pYOne, pOrig, pBP], {withLabel: true, radius: 2, name: function() {
                 return JXG.Math.Geometry.trueAngle([0, 1], [0, 0], options.bpCoords).toFixed(1) + '°';
             }});
         }
