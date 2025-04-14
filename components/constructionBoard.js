@@ -700,8 +700,8 @@ var createConstructionBoard = (userOptions = {}) => {
         const solSOKStyle = { strokeColor: Colors.blue, strokeWidth: 3 };
         board.create('circle', [options.sok_ctr, options.sok_rad], { ...solSOKStyle });
         if(options.showSyncSOKDetails) {
-            board.create('point', options.sok_ctr, { withLabel: false });
-            board.create('segment', [options.sok_ctr, [options.sok_ctr[1], options.sok_ctr[1] + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
+            board.create('point', options.sok_ctr, { withLabel: true, name: () => "x = " + options.sok_ctr[0].toFixed(2) + " cm" });
+            board.create('segment', [options.sok_ctr, [options.sok_ctr[0], options.sok_ctr[1] + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
         }
     }
 
