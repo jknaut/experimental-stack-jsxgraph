@@ -702,18 +702,20 @@ var createConstructionBoard = (userOptions = {}) => {
     } else if (options.showStaticSynchronousSOK) {
         const solSOKStyle = { strokeColor: Colors.blue, strokeWidth: 3 };
         board.create('circle', [options.sok_ctr, options.sok_rad], { ...solSOKStyle });
-        if(options.showSyncSOKDetails) {
+        if (options.showSyncSOKDetails) {
             board.create('point', options.sok_ctr, { withLabel: true, name: () => "x = " + options.sok_ctr[0].toFixed(2) + " cm" });
-            board.create('segment', [options.sok_ctr, [options.sok_ctr[0], options.sok_ctr[1] + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
+            board.create('segment', [options.sok_ctr, [options.sok_ctr[0], options.sok_ctr[1] + options.sok_rad]], { withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm" });
         }
-        if(options.showBP) {
-            var pOrig = board.create('point', [0, 0], {visible: false});
-            var pYOne = board.create('point', [0, 1], {visible: false});
-            var pBP = board.create('point', options.bpCoords, {visible: false});
-            board.create('arrow', [pOrig, pBP], {withLabel: true, name: () => "Teil (c)", strokeColor: "darkred", label: {anchorX: 'middle', strokeColor: "darkred"}});
-            board.create('angle', [pYOne, pOrig, pBP], {withLabel: true, radius: 2, name: function() {
-                return JXG.Math.Geometry.trueAngle([0, 1], [0, 0], options.bpCoords).toFixed(1) + '°';
-            }});
+        if (options.showBP) {
+            var pOrig = board.create('point', [0, 0], { visible: false });
+            var pYOne = board.create('point', [0, 1], { visible: false });
+            var pBP = board.create('point', options.bpCoords, { visible: false });
+            board.create('arrow', [pOrig, pBP], { withLabel: true, name: () => "Teil (c), Length: " + JXG.Math.Geometry.distance([pOrig.X(), pOrig.Y()], [pBP.X(), pBP.Y()], 2).toFixed(2) + " cm", strokeColor: "darkred", label: { anchorX: 'middle', strokeColor: "darkred" } });
+            board.create('angle', [pYOne, pOrig, pBP], {
+                withLabel: true, radius: 2, name: function () {
+                    return JXG.Math.Geometry.trueAngle([0, 1], [0, 0], options.bpCoords).toFixed(1) + '°';
+                }
+            });
         }
     }
 
