@@ -707,7 +707,7 @@ var createConstructionBoard = (userOptions = {}) => {
             board.create('segment', [options.sok_ctr, [options.sok_ctr[0], options.sok_ctr[1] + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
         }
         if(options.showBP) {
-            board.create('arrow', [[0, 0], bpCoords], {withLabel: true, name: () => "Teilaufgabe c"});
+            board.create('arrow', [[0, 0], options.bpCoords], {withLabel: true, name: () => "Teilaufgabe c"});
         }
     }
 
