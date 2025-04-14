@@ -35,6 +35,7 @@ var createConstructionBoard = (userOptions = {}) => {
         showStaticSynchronousSOK: false,
         sok_ctr: [0, 0],
         sok_rad: 5,
+        showSyncSOKDetails: false,
 
         showStaticAsyncSOK: false,
         xInenncm: 1.67,
@@ -698,6 +699,10 @@ var createConstructionBoard = (userOptions = {}) => {
     } else if (options.showStaticSynchronousSOK) {
         const solSOKStyle = { strokeColor: Colors.blue, strokeWidth: 3 };
         board.create('circle', [options.sok_ctr, options.sok_rad], { ...solSOKStyle });
+        if(options.showSyncSOKDetails) {
+            board.create('point', options.sok_ctr, { withLabel: false });
+            board.create('segment', [options.sok_ctr, [options.sok_ctr.X(), options.sok_ctr.X() + options.sok_rad]], {withLabel: true, name: () => "radius: " + options.sok_rad.toFixed(2) + " cm"});
+        }
     }
 
 
