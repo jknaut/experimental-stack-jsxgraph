@@ -440,15 +440,23 @@ var createConstructionBoard = (userOptions = {}) => {
 
     /* Daten von STACK holen oder verbinden */
     var pAxisLabelsData = null;
+    var updatePAxisLabelsData = () => {
+        pAxisLabelsData.moveTo([document.getElementById('xAxisChoice').selectedIndex, document.getElementById('yAxisChoice').selectedIndex]);
+    }
     if (!options.showStaticAsyncSOK) {
         var initialChoices = document.getElementById(ansAxisLabelsRef).value;
         pAxisLabelsData = board.create('point', [0, 0], { visible: false, highlight: false, size: 0 });
         stack_jxg.bind_point(ansAxisLabelsRef, pAxisLabelsData);
         changeDropdownChoice('xAxisChoice', Math.round(pAxisLabelsData.X()));
         changeDropdownChoice('yAxisChoice', Math.round(pAxisLabelsData.Y()));
+        if (options.showPhasorSolution) {
+            changeDropdownChoice('xAxisChoice', 1);
+            changeDropdownChoice('yAxisChoice', 4);
+            updatePAxisLabelsData();
+        }
 
         document.addEventListener('change', (e) => {
-            pAxisLabelsData.moveTo([document.getElementById('xAxisChoice').selectedIndex, document.getElementById('yAxisChoice').selectedIndex]);
+            updatePAxisLabelsData();
         });
     }
 
@@ -574,8 +582,9 @@ var createConstructionBoard = (userOptions = {}) => {
         var collight2 = "rgba(213, 94, 0, 0.5)";
         var collight3 = "rgba(0, 158, 115, 0.5)";
         const attDist = 0.3;
-        const vecPointStyle = { color: "grey", size: 1, fixed: false, highlight: false, showInfobox: false, snapToGrid: false, snapToPoints: true, attractorDistance: attDist };
-        const vecStyle = { withLabel: true, strokeWidth: 1, opacity: 0.75, lastArrow: { type: 2, size: 14 } };
+        const vFixed = options.showPhasorSolution;
+        const vecPointStyle = { color: "grey", size: 1, fixed: vFixed, highlight: false, showInfobox: false, snapToGrid: false, snapToPoints: true, attractorDistance: attDist };
+        const vecStyle = { withLabel: true, strokeWidth: 1, fixed: vFixed, opacity: 0.75, lastArrow: { type: 2, size: 14 } };
         var pCoords = options.vecPositions;
         var ps = [];
         var vecs = [];
