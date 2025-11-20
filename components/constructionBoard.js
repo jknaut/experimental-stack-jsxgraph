@@ -39,6 +39,8 @@ var createConstructionBoard = (userOptions = {}) => {
 
         showBP: false,
         bpCoords: [0, 0],
+        bpName: "Betriebspunkt",
+        sokName: "Stromortskurve",
 
         showStaticAsyncSOK: false,
         xInenncm: 1.67,
@@ -502,7 +504,7 @@ var createConstructionBoard = (userOptions = {}) => {
     var yBtnPos = ymax - 1;
 
     if (options.checkSOK) {
-        sokCheckbox = board.create('checkbox', [xmax - 4, yBtnPos, "Stromortskurve"], { fixed: true, frozen: true });
+        sokCheckbox = board.create('checkbox', [xmax - 4, yBtnPos, options.sokName], { fixed: true, frozen: true });
         JXG.addEvent(sokCheckbox.rendNodeCheckbox, 'change', function () {
             if (this.Value()) {
                 state.sokID = state.selectedID;
@@ -512,7 +514,7 @@ var createConstructionBoard = (userOptions = {}) => {
     }
 
     if (options.checkBP) {
-        bpCheckbox = board.create('checkbox', [xmax - 4, yBtnPos, "Betriebspunkt"], { fixed: true, frozen: true });
+        bpCheckbox = board.create('checkbox', [xmax - 4, yBtnPos, options.bpName], { fixed: true, frozen: true });
         JXG.addEvent(bpCheckbox.rendNodeCheckbox, 'change', function () {
             if (this.Value()) {
                 state.bpID = state.selectedID;
