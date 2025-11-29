@@ -22,6 +22,7 @@ var createConstructionBoard = (userOptions = {}) => {
     const defaultOptions = {
 
         checkSOK: true,
+        checkSOK2: false,
         checkBP: true,
         withVectorButton: true,
         tapePrecision: 1,
@@ -41,6 +42,7 @@ var createConstructionBoard = (userOptions = {}) => {
         bpCoords: [0, 0],
         bpName: "Betriebspunkt",
         sokName: "Stromortskurve",
+        sok2Name: "Zweite SOK",
 
         showStaticAsyncSOK: false,
         xInenncm: 1.67,
@@ -99,9 +101,11 @@ var createConstructionBoard = (userOptions = {}) => {
         objMap: new Map(), /* maps id to object */
         selectedID: null,
         sokID: "-1",
+        sok2ID: "-1",
         bpID: "-1",
     }
     var sokCheckbox = null;
+    var sok2Checkbox = null;
     var bpCheckbox = null;
 
     const generateId = () => {
@@ -153,6 +157,7 @@ var createConstructionBoard = (userOptions = {}) => {
     const selectHandler = (id) => {
         state.selectedID = id;
         if (sokCheckbox) sokCheckbox.rendNodeCheckbox.checked = state.selectedID == state.sokID;
+        if (sok2Checkbox) sok2Checkbox.rendNodeCheckbox.checked = state.selectedID == state.sok2ID;
         if (bpCheckbox) bpCheckbox.rendNodeCheckbox.checked = state.selectedID == state.bpID;
     }
 
@@ -513,6 +518,18 @@ var createConstructionBoard = (userOptions = {}) => {
         yBtnPos -= 1;
     }
 
+
+    if (options.checkSOK2) {
+        sok2Checkbox = board.create('checkbox', [xmax - 4, yBtnPos, options.sok2Name], { fixed: true, frozen: true });
+        JXG.addEvent(sok2Checkbox.rendNodeCheckbox, 'change', function () {
+            if (this.Value()) {
+                state.sok2ID = state.selectedID;
+            }
+        }, sok2Checkbox);
+        yBtnPos -= 1;
+    }
+
+
     if (options.checkBP) {
         bpCheckbox = board.create('checkbox', [xmax - 4, yBtnPos, options.bpName], { fixed: true, frozen: true });
         JXG.addEvent(bpCheckbox.rendNodeCheckbox, 'change', function () {
@@ -631,6 +648,7 @@ var createConstructionBoard = (userOptions = {}) => {
     if (storedState != "" || (storedState && storedState.objMap == [])) {
         state.selectedID = storedState.selectedID;
         state.sokID = storedState.sokID;
+        state.sok2ID = storedState.sok2ID;
         state.bpID = storedState.bpID;
         var createObjects = (value, key, map) => {
             map.set(key, createGeoObjectFromState(board, value));
@@ -638,8 +656,9 @@ var createConstructionBoard = (userOptions = {}) => {
         var preparedState = new Map(storedState.objMap);
         preparedState.forEach(createObjects);
         state.objMap = preparedState;
-        if ((state.sokID != "-1" || state.bpID != "-1") && state.selectedID) {
+        if ((state.sokID != "-1" || state.sok2ID != "-1" || state.bpID != "-1") && state.selectedID) {
             if (sokCheckbox) sokCheckbox.rendNodeCheckbox.checked = state.selectedID == state.sokID;
+            if (sok2Checkbox) sok2Checkbox.rendNodeCheckbox.checked = state.selectedID == state.sok2ID;
             if (bpCheckbox) bpCheckbox.rendNodeCheckbox.checked = state.selectedID == state.bpID;
         }
     } else {
@@ -788,6 +807,26 @@ var createConstructionBoard = (userOptions = {}) => {
             changeValue(ansSOKRef, JSON.stringify(["-1", [], -1]));
         }
 
+
+        if (state.sok2ID !== "-1") {
+            /*console.log("sok2ID is not -1");*/
+            var currentSOK2 = state.objMap.get(state.sok2ID);
+            if (currentSOK2) {
+                const type = currentSOK2.type;
+                var coordsCenter = null;
+                var radius = -1;
+                if (type === "flexcircle") {
+                    coordsCenter = [currentSOK2.pCenter.X(), currentSOK2.pCenter.Y()];
+                    radius = currentSOK2.computeRadius();
+                }
+                changeValue(ansSOK2Ref, JSON.stringify([type, coordsCenter, radius]));
+            }
+        } else if (options.checkSOK2) {
+            changeValue(ansSOK2Ref, JSON.stringify(["-1", [], -1]));
+        }
+
+
+
         if (state.bpID !== "-1") {
             /*console.log("bpID is not -1");*/
             var currentBP = state.objMap.get(state.bpID);
@@ -818,6 +857,7 @@ var createConstructionBoard = (userOptions = {}) => {
             objMap: preparedStateMapAsArray,
             selectedID: state.selectedID,
             sokID: state.sokID,
+            sok2ID: state.sok2ID,
             bpID: state.bpID,
         }
         changeValue(ansStateStorageRef, JSON.stringify(prepState));
