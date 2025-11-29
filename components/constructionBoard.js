@@ -721,7 +721,7 @@ var createConstructionBoard = (userOptions = {}) => {
             var pOrig = board.create('point', [0, 0], { visible: false });
             var pYOne = board.create('point', [0, 1], { visible: false });
             var pBP = board.create('point', options.bpCoords, { visible: false });
-            board.create('arrow', [pOrig, pBP], { withLabel: true, name: () => "Teil (c)<br>Length: " + JXG.Math.Geometry.distance([pOrig.X(), pOrig.Y()], [pBP.X(), pBP.Y()], 2).toFixed(2) + " cm", strokeColor: "darkred", label: { anchorY: 'middle', anchorX: 'middle', strokeColor: "darkred" } });
+            board.create('arrow', [pOrig, pBP], { withLabel: true, name: () => options.bpName + "<br>Length: " + JXG.Math.Geometry.distance([pOrig.X(), pOrig.Y()], [pBP.X(), pBP.Y()], 2).toFixed(2) + " cm", strokeColor: "darkred", label: { anchorY: 'middle', anchorX: 'middle', strokeColor: "darkred" } });
             board.create('angle', [pYOne, pOrig, pBP], {
                 withLabel: true, radius: 2, name: function () {
                     return JXG.Math.Geometry.trueAngle([0, 1], [0, 0], options.bpCoords).toFixed(1) + '°';
