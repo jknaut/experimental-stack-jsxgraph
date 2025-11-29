@@ -572,7 +572,7 @@ var createConstructionBoard = (userOptions = {}) => {
     var amCenter = board.create('point', mpls[4], { ...amPStyle });
     var amRightSeg = board.create('segment', [amStart, amCenter], { strokeColor: col5 });
     var amLeftSeg = board.create('segment', [amCenter, amEnd], { strokeColor: col5 });
-    var angleMeasure = board.create('angle', [amStart, amCenter, amEnd], { label: { cssStyle: 'backgroundColor: rgba(0, 0, 0, 0.7); padding: 3px', strokeColor: 'white' }, fillColor: col5, strokeColor: col5, name: () => '&phi; = ' + JXG.Math.Geometry.trueAngle(amStart, amCenter, amEnd).toFixed(0) + '°' });
+    var angleMeasure = board.create('angle', [amStart, amCenter, amEnd], { label: { cssStyle: 'backgroundColor: rgba(0, 0, 0, 0.7); padding: 3px', strokeColor: 'white' }, fillColor: col5, strokeColor: col5, name: () => '&phi; = ' + JXG.Math.Geometry.trueAngle(amStart, amCenter, amEnd).toFixed(2) + '°' });
     var amGroup = board.create('group', [amStart, amCenter, amEnd]);
     amGroup.setTranslationPoints([amCenter]);
     /*Zeigerdiagramm*/
@@ -613,8 +613,8 @@ var createConstructionBoard = (userOptions = {}) => {
                 if (pAxisLabelsData && pAxisLabelsData.Y() == 4) {
                     nPolar = { 'abs': nPolar.abs, 'angle': JXG.Math.mod(nPolar.angle - 90.0, 360) };
                 }
-                var r = nPolar.abs.toFixed(1);
-                var phi = nPolar.angle.toFixed(1);
+                var r = nPolar.abs.toFixed(2);
+                var phi = nPolar.angle.toFixed(2);
                 return r + " cm, " + phi + "&deg;";
             }], { visible: false, fontSize: 10, anchorX: 'middle', anchorY: 'middle', fontWeight: 'bold', strokeColor: 'white', cssStyle: 'backgroundColor: rgba(0, 0, 0, 0.7); padding: 3px' });
             ps[2 * j + 1].on("mouseover", () => { texts[j].setAttribute({ visible: true }); });
