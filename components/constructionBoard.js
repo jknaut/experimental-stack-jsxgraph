@@ -390,10 +390,10 @@ var createConstructionBoard = (userOptions = {}) => {
     }
 
     const optionsText = '<option value="nochoice"></option><option value="-Im">-Im/cm</option><option value="-Re">-Re/cm</option><option value="Im">Im/cm</option><option value="Re">Re/cm</option>';
-    const xmin = options.showStaticAsyncSOK ? -5 : -12;
-    const xmax = options.showStaticAsyncSOK ? 16 : 13;
+    const xmin = options.showStaticAsyncSOK ? -5 : -10;
+    const xmax = options.showStaticAsyncSOK ? 16 : 11;
     const ymin = -8.5;
-    const ymax = 16.5;
+    const ymax = 12.5;
     const board = JXG.JSXGraph.initBoard(divid, {
         boundingbox: [xmin, ymax, xmax, ymin],
         axis: true,
