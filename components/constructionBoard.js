@@ -602,12 +602,6 @@ var createConstructionBoard = (userOptions = {}) => {
     amGroup.setTranslationPoints([amCenter]);
     /*Zeigerdiagramm*/
     if (options.withPhasorDiagram) {
-        var col1 = JXG.paletteWong.blue;
-        var col2 = JXG.paletteWong.red;
-        var col3 = JXG.paletteWong.green;
-        var collight1 = "rgba(0, 72, 178, 0.5)";
-        var collight2 = "rgba(213, 94, 0, 0.5)";
-        var collight3 = "rgba(0, 158, 115, 0.5)";
         const attDist = 0.3;
         const vFixed = options.showPhasorSolution;
         const vecPointStyle = { color: "grey", size: 1, fixed: vFixed, highlight: false, showInfobox: false, snapToGrid: false, snapToPoints: true, attractorDistance: attDist };
@@ -761,45 +755,6 @@ var createConstructionBoard = (userOptions = {}) => {
             });
         }
     }
-
-
-
-    /* TODO: Muster-SOK durch Checkbox anzeigen für x:=(-Im) und y:=Re */
-    /*
-    const solPStyle = {color: 'darkred'};
-    const solVecStyle = {strokeColor: Colors.purple, strokeWidth: 2};
-    const solHelperCircStyle = {strokeColor: Colors.orange, strokeWidth: 1};
-    const solSOKStyle = {strokeColor: Colors.blue, strokeWidth: 3};
-    const solLineStyle = {strokeColor: 'black', strokeWidth: 2};
-    var p_Inenn_coords = interpreteCoords([{#xInenncm#}, {#yInenncm#}], ['-Im', 'Re']);
-    var vec_Inenn = board.create("arrow", [[0, 0], p_Inenn_coords], {...solVecStyle});
-    var p_Istill_coords = interpreteCoords([{#xIstillcm#}, {#yIstillcm#}], ['-Im', 'Re']);
-    var vec_Istill = board.create("arrow", [[0, 0], p_Istill_coords], {...solVecStyle});
-    const helper_circ_radius = Math.max(Math.abs(p_Istill_coords[0]), Math.abs(p_Inenn_coords[0]));
-    var helper_circ_Istill = board.create('circle', [p_Istill_coords, helper_circ_radius], {...solHelperCircStyle});
-    var helper_circ_Inenn = board.create('circle', [p_Inenn_coords, helper_circ_radius], {...solHelperCircStyle});
-    var p_Istill = board.create('point', p_Istill_coords, {...solPStyle});
-    var p_Inenn = board.create('point', p_Inenn_coords, {...solPStyle});
-    var line_Inenn_Istill = board.create('line', [p_Istill, p_Inenn], {...solLineStyle, strokeWidth: 1});
-    var midp_Inenn_Istill = board.create('midpoint', [p_Istill, p_Inenn], {...solPStyle});
-    var line_perp = board.create('perpendicular', [line_Inenn_Istill, midp_Inenn_Istill], {...solLineStyle});
-    var center_SOK = board.create('intersection', [board.defaultAxes.x, line_perp], {...solPStyle});
-    var radius_SOK = JXG.Math.Geometry.distance(p_Istill_coords, [center_SOK.X(), center_SOK.Y()], 2);
-    var circ_SOK = board.create('circle', [center_SOK, radius_SOK], {...solSOKStyle}); 
-    
-    var musterElements = [vec_Inenn, vec_Istill, helper_circ_Istill, helper_circ_Inenn, p_Istill, p_Inenn, line_Inenn_Istill, midp_Inenn_Istill, line_perp, center_SOK, circ_SOK];
-    
-    const showSolutionCB = board.create("checkbox", [xmax-8.5, ymin+1.5, "Lösung anzeigen (x= - Im, y= Re)"], {fixed: true, frozen: true});
-    showSolutionCB.rendNodeCheckbox.checked = false;
-    for(let i = 0; i < musterElements.length; i++) {
-      musterElements[i].setAttribute({visible: false, fixed: true, strokeOpacity: 0.7, fillOpacity: 0.7, highlight: false});
-    }
-    JXG.addEvent(showSolutionCB.rendNodeCheckbox, 'change', function() {
-      for(let i = 0; i < musterElements.length; i++) {
-        musterElements[i].setAttribute({visible: this.Value()});
-      }
-    }, showSolutionCB);
-    */
 
     function storeState() {
         /*console.log("storeState");*/
