@@ -31,6 +31,7 @@ var createConstructionBoard = (userOptions = {}) => {
         showPhasorSolution: false,
         vecPositions: [[-9, 11], [-6, 11], [-9, 10], [-6, 10], [-9, 9], [-6, 9], [-9, 8], [-6, 8], [-9, 7], [-6, 7], [-9, 6], [-6, 6], [-9, 5], [-6, 5], [-9, 4], [-6, 4]],
         vecLabels: ["\\(\\underline{U}_1\\)", "\\(\\underline{I}_1\\)", "\\(\\underline{U}_P\\)", "\\(\\underline{I}_{\\mu}\\)", "\\(\\underline{I}'_E\\)", "\\(\\underline{U}_r\\)", "\\(-j X_{1\\sigma} \\cdot \\underline{I}_1\\)", "\\(-j X_h \\cdot \\underline{I}_1\\)"],
+        vecColors: Array.from({ length: 8 }, () => JXG.palette.blue),
         useMathJax: false,
 
         showStaticSynchronousSOK: false,
@@ -50,6 +51,10 @@ var createConstructionBoard = (userOptions = {}) => {
         yInenncm: -0.9,
         xIstillcm: 2.78,
         yIstillcm: -11.62,
+
+        usesFixedAxes: false,
+        xAxisLabel: "d",
+        yAxisLabel: "q",
 
     };
     const options = { ...defaultOptions, ...userOptions };
@@ -396,6 +401,8 @@ var createConstructionBoard = (userOptions = {}) => {
     }
 
     const optionsText = '<option value="nochoice"></option><option value="-Im">-Im/cm</option><option value="-Re">-Re/cm</option><option value="Im">Im/cm</option><option value="Re">Re/cm</option>';
+    const dropdownXName = () => options.showStaticAsyncSOK ? '-Im/cm' : '<select name="xAxisChoice" id="xAxisChoice">' + optionsText + '</select>';
+    const dropdownYName = () => options.showStaticAsyncSOK ? 'Re/cm' : '<select name="yAxisChoice" id="yAxisChoice">' + optionsText + '</select>';
     const xmin = options.showStaticAsyncSOK ? -5 : -10;
     const xmax = options.showStaticAsyncSOK ? 16 : 11;
     const ymin = -8.5;
@@ -407,11 +414,11 @@ var createConstructionBoard = (userOptions = {}) => {
         keepAspectRatio: true,
         defaultAxes: {
             x: {
-                name: options.showStaticAsyncSOK ? '-Im/cm' : '<select name="xAxisChoice" id="xAxisChoice">' + optionsText + '</select>',
+                name: options.usesFixedAxes? options.xAxisLabel : dropdownXName(),
                 withLabel: true,
                 label: {
                     position: 'rt',
-                    offset: options.showStaticAsyncSOK ? [-40, -30] : [-65, -30],
+                    offset: options.showStaticAsyncSOK ? [-40, -30] : (options.usesFixedAxes? [-10, 8] : [-65, -30]),
                     cssStyle: 'font-weight: bold;'
                 },
                 ticks: {
@@ -423,11 +430,11 @@ var createConstructionBoard = (userOptions = {}) => {
                 }
             },
             y: {
-                name: options.showStaticAsyncSOK ? 'Re/cm' : '<select name="yAxisChoice" id="yAxisChoice">' + optionsText + '</select>',
+                name: options.usesFixedAxes? options.yAxisLabel : dropdownYName(),
                 withLabel: true,
                 label: {
                     position: 'rt',
-                    offset: options.showStaticAsyncSOK ? [-72, -5] : [-92, -5],
+                    offset: options.showStaticAsyncSOK ? [-72, -5] : (options.usesFixedAxes? [8, -2] : [-92, -5]),
                     cssStyle: 'font-weight: bold;'
                 },
                 ticks: {
@@ -451,7 +458,7 @@ var createConstructionBoard = (userOptions = {}) => {
     var updatePAxisLabelsData = () => {
         pAxisLabelsData.moveTo([document.getElementById('xAxisChoice').selectedIndex, document.getElementById('yAxisChoice').selectedIndex]);
     }
-    if (!options.showStaticAsyncSOK) {
+    if (!options.showStaticAsyncSOK && !options.usesFixedAxes) {
         var initialChoices = document.getElementById(ansAxisLabelsRef).value;
         pAxisLabelsData = board.create('point', [0, 0], { visible: false, highlight: false, size: 0 });
         stack_jxg.bind_point(ansAxisLabelsRef, pAxisLabelsData);
@@ -614,9 +621,9 @@ var createConstructionBoard = (userOptions = {}) => {
         for (let i = 0, j = 0; i < pCoords.length; i++) {
             ps[i] = board.create("point", pCoords[i], { ...vecPointStyle, withLabel: false });
             if (i % 2 == 1) {
-                vecs[j] = board.create("arrow", [ps[i - 1], ps[i]], { ...vecStyle, withLabel: false, color: col1 });
+                vecs[j] = board.create("arrow", [ps[i - 1], ps[i]], { ...vecStyle, withLabel: false, color: options.vecColors[j] });
                 mps[i] = board.create("midpoint", [ps[i - 1], ps[i]], { visible: false, highlight: false, size: 0 });
-                mpLabels[i] = board.create("text", [() => mps[i].X(), () => mps[i].Y(), vecLabels[j]], { anchorX: 'left', anchorY: 'middle', color: "white", cssStyle: `background-color: ${collight1}; padding: 2px 4px; border-radius: 4px;` });
+                mpLabels[i] = board.create("text", [() => mps[i].X(), () => mps[i].Y(), vecLabels[j]], { anchorX: 'left', anchorY: 'middle', color: "white", cssStyle: `background-color: ${options.vecColors[j]}; padding: 2px 4px; border-radius: 4px;` });
                 j = j + 1;
             }
         }
