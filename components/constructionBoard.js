@@ -53,8 +53,8 @@ var createConstructionBoard = (userOptions = {}) => {
         yIstillcm: -11.62,
 
         usesFixedAxes: false,
-        xAxisLabel: "d",
-        yAxisLabel: "q",
+        xAxisLabel: "\\(d\\)",
+        yAxisLabel: "\\(q\\)",
 
     };
     const options = { ...defaultOptions, ...userOptions };
